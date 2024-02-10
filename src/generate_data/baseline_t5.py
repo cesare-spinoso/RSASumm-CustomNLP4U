@@ -86,17 +86,22 @@ def main(run_name: str, cfg: DictConfig) -> None:
                 references=references,
                 use_aggregator=False,
             )
+            assert all(
+                len(prediction_scores) == len(rouge_scores[score_type])
+                for score_type in rouge_scores
+            )
             dict_to_write = [
                 {
-                    "source": s,
-                    "ref": r,
-                    "pred": pred,
-                    "pred_score": pred_score,
-                    "rouge_score": rouge_score,
+                    "source": sources[i],
+                    "ref": references[i],
+                    "pred": predictions[i],
+                    "pred_score": prediction_scores[i].item(),
+                    **{
+                        score_type: rouge_scores[score_type][i]
+                        for score_type in rouge_scores
+                    },
                 }
-                for s, r, pred, pred_score, rouge_score in zip(
-                    sources, references, predictions, prediction_scores, rouge_scores
-                )
+                for i in range(len(sources))
             ]
             writer.write_all(dict_to_write)
 
