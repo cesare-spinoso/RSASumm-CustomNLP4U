@@ -97,7 +97,7 @@ def main(run_name: str, cfg: DictConfig) -> None:
                     sources, references, predictions, prediction_scores, rouge_scores
                 )
             ]
-            writer.writeall(dict_to_write)
+            writer.write_all(dict_to_write)
 
 
 if __name__ == "__main__":
