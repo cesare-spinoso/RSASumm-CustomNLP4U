@@ -6,14 +6,17 @@ import hydra
 from tqdm import tqdm
 import os
 from src import SCRATCH_CACHE_DIR
-from src.utils import main_decorator
+from src.utils.decorators import main_decorator
 from omegaconf import DictConfig
 
 CNNDM = "cnn_dailymail"
 MODEL_NAME = "google-t5/t5-small"
 
 
-@hydra.main(version_base=None)
+@hydra.main(
+    version_base=None,
+    config_path="/home/mila/c/cesare.spinoso/RSASumm/src/generate_data/conf",
+)
 @main_decorator
 def main(run_name: str, cfg: DictConfig) -> None:
     # Load dataset
@@ -46,7 +49,7 @@ def main(run_name: str, cfg: DictConfig) -> None:
     with jsonlines.open(
         os.path.join(["output_directory"], f"{run_name}.jsonl"), "a"
     ) as writer:
-        for i in tqdm(range(num_batches)):
+        for i in tqdm(range(1)):
             # Generate
             outputs = model.generate(
                 source_input_ids[i * batch_size : (i + 1) * batch_size],
@@ -95,3 +98,7 @@ def main(run_name: str, cfg: DictConfig) -> None:
                 )
             ]
             writer.writeall(dict_to_write)
+
+
+if __name__ == "__main__":
+    main()
