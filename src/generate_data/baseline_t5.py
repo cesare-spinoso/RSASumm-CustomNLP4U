@@ -73,7 +73,7 @@ def main(run_name: str, cfg: DictConfig) -> None:
             predictions = tokenizer.batch_decode(
                 outputs["sequences"], skip_special_tokens=True
             )
-            prediction_scores = outputs[""]
+            prediction_scores = outputs["sequences_scores"]
             assert (
                 len(sources)
                 == len(references)
