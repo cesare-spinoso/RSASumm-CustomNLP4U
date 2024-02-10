@@ -16,6 +16,7 @@ MODEL_NAME = "google-t5/t5-small"
 @hydra.main(
     version_base=None,
     config_path="/home/mila/c/cesare.spinoso/RSASumm/src/generate_data/conf",
+    config_name="config",
 )
 @main_decorator
 def main(run_name: str, cfg: DictConfig) -> None:
