@@ -47,7 +47,7 @@ def main(run_name: str, cfg: DictConfig) -> None:
     num_batches = source_input_ids.shape[0] // batch_size
     rouge = evaluate.load("rouge")
     with jsonlines.open(
-        os.path.join(["output_directory"], f"{run_name}.jsonl"), "a"
+        os.path.join(cfg["output_directory"], f"{run_name}.jsonl"), "a"
     ) as writer:
         for i in tqdm(range(1)):
             # Generate
