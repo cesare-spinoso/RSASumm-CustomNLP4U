@@ -1,4 +1,5 @@
 from transformers import T5Tokenizer, T5ForConditionalGeneration
+from transformers import set_seed
 import datasets
 import evaluate
 import jsonlines
@@ -16,7 +17,6 @@ MODEL_NAME = "google-t5/t5-small"
 @hydra.main(
     version_base=None,
     config_path="/home/mila/c/cesare.spinoso/RSASumm/src/generate_data/conf",
-    config_name="config",
 )
 @main_decorator
 def main(run_name: str, cfg: DictConfig) -> None:
@@ -47,10 +47,13 @@ def main(run_name: str, cfg: DictConfig) -> None:
     batch_size = cfg["generation"]["batch_size"]
     num_batches = source_input_ids.shape[0] // batch_size
     rouge = evaluate.load("rouge")
+    # Set seed if specified
+    if "seed" in cfg["generation"]:
+        set_seed(cfg["generation"]["seed"])
     with jsonlines.open(
         os.path.join(cfg["output_directory"], f"{run_name}.jsonl"), "a"
     ) as writer:
-        for i in tqdm(range(1)):
+        for i in tqdm(range(num_batches)):
             # Generate
             outputs = model.generate(
                 source_input_ids[i * batch_size : (i + 1) * batch_size],
