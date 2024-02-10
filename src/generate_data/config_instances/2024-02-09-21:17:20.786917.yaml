@@ -18,4 +18,4 @@ generation:
     return_dict_in_generate: true
 output_directory: /network/scratch/c/cesare.spinoso/rsasumm/generate_data
 write_config_directory: /home/mila/c/cesare.spinoso/RSASumm/src/generate_data/config_instances
-finished_running: false
+finished_running: true
