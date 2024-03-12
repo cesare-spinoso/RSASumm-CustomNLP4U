@@ -59,13 +59,49 @@ def multioped_preprocess(cfg):
     return data
 
 
+def extract_data(raw_directory, files):
+    data = []
+    for file_name in files:
+        with open(os.path.join(raw_directory, file_name), "r") as f:
+            data.append(f.readlines())
+    # remove <s>, <eos>
+    data = [d.replace("<s>", "").replace("<eos>", "").strip() for d in data]
+    return data
+
+
 def debatepedia_preprocess(cfg):
-    from src.data.debatepedia import DebatepediaPreprocessor
-
-    dp = DebatepediaPreprocessor(cfg)
-    dp.run()
-
-
+    # Read and merge files of the same type together
+    raw_directory = cfg["raw_directory"]
+    content_data = extract_data(raw_directory, files=cfg["content_files"])
+    summary_data = extract_data(raw_directory, files=cfg["summary_files"])
+    query_data = extract_data(raw_directory, files=cfg["query_files"])
+    assert len(content_data) == len(summary_data) == len(query_data)
+    # For query, split by : left is topic, right is query
+    indices = []
+    topics = []
+    queries = []
+    for i, q in enumerate(query_data):
+        split_q = q.split(":")
+        if len(split_q) == 2:
+            indices.append(i)
+            topics.append(split_q[0])
+            queries.append(split_q[1])
+    content_data = [content_data[i] for i in indices]
+    summary_data = [summary_data[i] for i in indices]
+    assert len(content_data) == len(summary_data) == len(queries) == len(topics)
+    data = pd.DataFrame(
+        {
+            "document": content_data,
+            "summary": summary_data,
+            "query": queries,
+            "topic": topics,
+        }
+    )
+    column_names = data.columns.tolist()
+    for col in cfg["column_names"]:
+        if col not in column_names:
+            data[col] = None
+    return data
 
 
 def write_preprocesed_data(preprocessed_data, cfg):
