@@ -1,5 +1,6 @@
 dataset:
   name: "cnn_dailymail"
+  # Use 3.0.0 since it's the same as Andreas's paper
   version: "3.0.0"
   source_name: "article"
   reference_name: "highlights"
@@ -9,10 +10,8 @@ model:
   name: t5-small
 generation:
   batch_size: 16
-  seed: 42
   generate_kwargs:
     max_length: 150
-    do_sample: True
     num_beams: 5
     num_return_sequences: 5
     early_stopping: True

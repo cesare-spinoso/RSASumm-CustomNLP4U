@@ -10,29 +10,34 @@ from src import SCRATCH_CACHE_DIR, SRC_DIRECTORY
 from src.utils.decorators import main_decorator
 from omegaconf import DictConfig
 
-CNNDM = "cnn_dailymail"
-MODEL_NAME = "google-t5/t5-small"
+
+def load_model(cfg):
+    if cfg["tokenizer"]["name"] == cfg["model"]["name"] and cfg["model"][
+        "name"
+    ].startswith("t5"):
+        # See https://github.com/huggingface/transformers/pull/24565 for why legacy=False
+        tokenizer = T5Tokenizer.from_pretrained(
+            cfg["tokenizer"]["name"], cache_dir=SCRATCH_CACHE_DIR, legacy=False
+        )
+        model = T5ForConditionalGeneration.from_pretrained(
+            cfg["model"]["name"], cache_dir=SCRATCH_CACHE_DIR
+        )
+
+    return tokenizer, model
 
 
 @hydra.main(
-    version_base=None,
-    config_path=os.path.join(SRC_DIRECTORY, "generate_data", "conf")
+    version_base=None, config_path=os.path.join(SRC_DIRECTORY, "generate_data", "conf")
 )
 @main_decorator
 def main(run_name: str, cfg: DictConfig) -> None:
+    # Set seed if specified
+    if "seed" in cfg["generation"]:
+        set_seed(cfg["generation"]["seed"])
     # Load dataset
-    # Use 3.0.0 since it's the same as Andreas's paper
-    dataset = datasets.load_dataset(
-        cfg["dataset"]["name"], cfg["dataset"]["version"], cache_dir=SCRATCH_CACHE_DIR
-    )
+    dataset = get_dataset(cfg)
     # Load model
-    # See https://github.com/huggingface/transformers/pull/24565 for why legacy=False
-    tokenizer = T5Tokenizer.from_pretrained(
-        cfg["tokenizer"]["name"], cache_dir=SCRATCH_CACHE_DIR, legacy=False
-    )
-    model = T5ForConditionalGeneration.from_pretrained(
-        cfg["model"]["name"], cache_dir=SCRATCH_CACHE_DIR
-    )
+    tokenizer, model = load_model(cfg)
     # Get test data
     test_source = dataset["test"][cfg["dataset"]["source_name"]]
     test_reference = dataset["test"][cfg["dataset"]["reference_name"]]
@@ -47,9 +52,6 @@ def main(run_name: str, cfg: DictConfig) -> None:
     batch_size = cfg["generation"]["batch_size"]
     num_batches = source_input_ids.shape[0] // batch_size
     rouge = evaluate.load("rouge")
-    # Set seed if specified
-    if "seed" in cfg["generation"]:
-        set_seed(cfg["generation"]["seed"])
     with jsonlines.open(
         os.path.join(cfg["output_directory"], f"{run_name}.jsonl"), "a"
     ) as writer:
@@ -107,6 +109,13 @@ def main(run_name: str, cfg: DictConfig) -> None:
                 for i in range(len(sources))
             ]
             writer.write_all(dict_to_write)
+
+def get_dataset(cfg):
+    dataset = datasets.load_dataset(
+        cfg["dataset"]["name"], cfg["dataset"]["version"], cache_dir=SCRATCH_CACHE_DIR
+    )
+    
+    return dataset
 
 
 if __name__ == "__main__":
