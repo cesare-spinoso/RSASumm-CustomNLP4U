@@ -63,7 +63,7 @@ def extract_data(raw_directory, files):
     data = []
     for file_name in files:
         with open(os.path.join(raw_directory, file_name), "r") as f:
-            data.append(f.readlines())
+            data.extend(f.readlines())
     # remove <s>, <eos>
     data = [d.replace("<s>", "").replace("<eos>", "").strip() for d in data]
     return data
