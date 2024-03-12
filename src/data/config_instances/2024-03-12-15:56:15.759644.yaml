@@ -21,4 +21,4 @@ column_names:
 - answer
 output_directory: /home/mila/c/cesare.spinoso/RSASumm/data/debatepedia
 write_config_directory: /home/mila/c/cesare.spinoso/RSASumm/src/data/config_instances
-finished_running: false
+finished_running: true
