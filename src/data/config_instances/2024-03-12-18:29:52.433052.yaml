@@ -1,15 +1,16 @@
 dataset_name: qmsum
 raw_data_dir_path: /home/mila/c/cesare.spinoso/RSASumm/data/qmsum/raw
 column_names:
-  - document
-  - summary
-  - emotion
-  - topic
-  - question
-  - answer
+- document
+- summary
+- emotion
+- topic
+- question
+- answer
 files:
-  - train.jsonl
-  - val.jsonl
-  - test.jsonl
+- train.jsonl
+- val.jsonl
+- test.jsonl
 output_directory: /home/mila/c/cesare.spinoso/RSASumm/data/qmsum
 write_config_directory: /home/mila/c/cesare.spinoso/RSASumm/src/data/config_instances
+finished_running: false
