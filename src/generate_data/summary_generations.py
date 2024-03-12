@@ -6,7 +6,7 @@ import jsonlines
 import hydra
 from tqdm import tqdm
 import os
-from src import SCRATCH_CACHE_DIR
+from src import SCRATCH_CACHE_DIR, SRC_DIRECTORY
 from src.utils.decorators import main_decorator
 from omegaconf import DictConfig
 
@@ -16,7 +16,7 @@ MODEL_NAME = "google-t5/t5-small"
 
 @hydra.main(
     version_base=None,
-    config_path="/home/mila/c/cesare.spinoso/RSASumm/src/generate_data/conf",
+    config_path=os.path.join(SRC_DIRECTORY, "generate_data", "conf")
 )
 @main_decorator
 def main(run_name: str, cfg: DictConfig) -> None:
