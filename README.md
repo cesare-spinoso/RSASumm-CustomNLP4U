@@ -61,9 +61,23 @@ Can we use RSA for Summ?
     - Comments: Longformer as encoder and transformer as decoder.
 - T5:
     - Comments: Already used it in a preliminary experiment with news summarization.
-3. Run inference-only experiments first with e.g. Llama-2
-- This is lower risk/difficulty
-- Priority:
-    1. Run experiments where source document fits in Llama-2 and other pre-trained summarization systems. Do this only in the output space.
+3. Run inference-only experiments first
+    - Experiment 1:
+    ![alt text](image.png)
+    - Things to do:
+        - [ ] Download and format the datasets.
+            - Decisions:
+                - Covidet: For debatepedia, we remove the samples which do not have both emotion and summary.
+                - Multioped: For multioped, we use the replaced answer (the one with anaphora resolution) as the true answer. I also drop the support 0/1 column though it might be useful for other experiments.
+                - Debatepedia: For debatepedia, the noun phrase before the query is used as the topic of the summary.
+                - QMSum: I drop the general summary for the entire meeting.
+                - TAC/DUC: I have yet to do TAC/DUC but seem to be a pain. 
+            - Comments: Be on the lookout for cases where the same document occurs multiple times for the same query/topic (e.g., due to multiple annotators). The document_id column is there to help track this.
+        - [ ] Find pre-trained summarizers
+        - [ ] Use diverse-decoding method : https://arxiv.org/pdf/1610.02424.pdf (You should probably run a metric to check that they are indeed diverse.)
+        - [ ] Score with different objectives
+        - [ ] Rerank based on those objectives
+            - For question-based summaries (debatepedia/multioped), no conversions from z is needed. The debatepedia reference "summaries" are much more like answers. The "perspectives" from the multioped dataset are also like answers to the query (except that in this case there's also a reference summary).
+            - For topic-based summaries (covidet/duc/tac), convert the topic to a question. For covidet, the "emotion" should be converted to "What emotion is in this summary?". 
 4. Run fine-tuning experiments second
 - This is higher risk/difficulty
