@@ -136,6 +136,15 @@ def qmsum_preprocess(cfg):
             preprocessed_data["document"] += extract_qmsum_doc(
                 document_list, query_dict["relevant_text_span"]
             )
+    assert (
+        (num_samples := len(preprocessed_data["document"]))
+        == len(preprocessed_data["question"])
+        == len(preprocessed_data["summary"])
+    )
+    preprocessed_data = {
+        k: v if len(v) > 0 else [None] * num_samples
+        for k, v in preprocessed_data.items()
+    }
     return preprocessed_data
 
 
