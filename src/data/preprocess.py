@@ -21,8 +21,13 @@ def covidet_preprocess(cfg):
         annotations = post_content["Annotations"]
         for v in annotations.values():
             for annotations_dict in v:
-                emotion = annotations_dict["Emotion"]
-                summary = annotations_dict["Abstractive"]
+                if (
+                    len(annotations_dict) == 2
+                    and "Emotion" in annotations_dict
+                    and "Abstractive" in annotations_dict
+                ):
+                    emotion = annotations_dict["Emotion"]
+                    summary = annotations_dict["Abstractive"]
         preprocessed_data["document"].append(document)
         preprocessed_data["emotion"].append(emotion)
         preprocessed_data["summary"].append(summary)
@@ -57,10 +62,11 @@ def write_preprocesed_data(preprocessed_data, cfg):
     preprocessed_df = pd.DataFrame(preprocessed_data)
     preprocessed_df.to_csv(path_to_write, index=False)
 
+
 @hydra.main(
     version_base=None,
     config_path=os.path.join(SRC_DIRECTORY, "data", "conf"),
-    config_name="covidet"
+    config_name="covidet",
 )
 @main_decorator
 def main(run_name: str, cfg: dict):
