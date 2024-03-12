@@ -60,6 +60,7 @@ def write_preprocesed_data(preprocessed_data, cfg):
 @hydra.main(
     version_base=None,
     config_path=os.path.join(SRC_DIRECTORY, "data", "conf"),
+    config_name="covidet"
 )
 @main_decorator
 def main(run_name: str, cfg: dict):
