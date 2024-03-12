@@ -71,7 +71,7 @@ def extract_data(raw_directory, files):
 
 def debatepedia_preprocess(cfg):
     # Read and merge files of the same type together
-    raw_directory = cfg["raw_directory"]
+    raw_directory = cfg["raw_data_dir_path"]
     content_data = extract_data(raw_directory, files=cfg["content_files"])
     summary_data = extract_data(raw_directory, files=cfg["summary_files"])
     query_data = extract_data(raw_directory, files=cfg["query_files"])
