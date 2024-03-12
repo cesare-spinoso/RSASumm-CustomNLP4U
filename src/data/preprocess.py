@@ -2,7 +2,9 @@
 # 1. For debatepedia, merege all the files
 # 2. For all the files, flatten the structure (if not flattened yet)
 # and save under the same column-name schema
-import json, os
+# 3. Add document ids
+
+import json, jsonlines, os
 import hydra
 import pandas as pd
 from src import SRC_DIRECTORY
@@ -104,6 +106,41 @@ def debatepedia_preprocess(cfg):
     return data
 
 
+def extract_qmsum_doc(document_list: list[dict], relevant_text_span: list[list]) -> str:
+    relevant_text_span = [[int(elt) for elt in outer] for outer in relevant_text_span]
+    selected_lines = []
+    for outer in relevant_text_span:
+        # Page 4 of their paper : It looks like its inclusive
+        selected_lines += document_list[outer[0] : outer[1] + 1]
+    merged_speaker_utterance = [
+        elt["speaker"] + " : " + elt["content"] for elt in selected_lines
+    ]
+    return " ".join(merged_speaker_utterance)
+
+
+def qmsum_preprocess(cfg):
+    raw_directory = cfg["raw_data_dir_path"]
+    data = []
+    for file_name in cfg["files"]:
+        file_path = os.path.join(raw_directory, file_name)
+        with jsonlines.open(file_path) as reader:
+            for obj in reader:
+                data.append(obj)
+    preprocessed_data = dict.fromkeys(cfg["column_names"], None)
+    preprocessed_data = {k: [] for k in preprocessed_data.keys()}
+    for elt in data:
+        json_dict = elt["topic_list"]
+        document_list = json_dict["meeting_transcripts"]
+        for query_dict in json_dict["general_query_list"]:
+            if "relevant_text_span" in query_dict:
+                preprocessed_data["query"] += query_dict["query"]
+                preprocessed_data["summary"] += query_dict["answer"]
+                preprocessed_data["document"] = extract_qmsum_doc(
+                    document_list, query_dict["relevant_text_span"]
+                )
+    return data
+
+
 def write_preprocesed_data(preprocessed_data, cfg):
     path_to_write = os.path.join(cfg["output_directory"], "preprocessed.csv")
     preprocessed_df = pd.DataFrame(preprocessed_data)
@@ -122,6 +159,12 @@ def main(run_name: str, cfg: dict):
         preprocessed_data = multioped_preprocess(cfg)
     elif cfg["dataset_name"] == "covidet":
         preprocessed_data = covidet_preprocess(cfg)
+    elif cfg["dataset_name"] == "qmsum":
+        preprocessed_data = qmsum_preprocess(cfg)
+    elif cfg["dataset_name"] == "tac":
+        raise ValueError("Not yet implemented!")
+    elif cfg["dataset_name"] == "duc":
+        raise ValueError("Not yet implemented!")
     else:
         raise ValueError(f"No preprocessing for {cfg['dataset_name']} dataset")
     pass
