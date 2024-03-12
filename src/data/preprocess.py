@@ -128,16 +128,14 @@ def qmsum_preprocess(cfg):
                 data.append(obj)
     preprocessed_data = dict.fromkeys(cfg["column_names"], None)
     preprocessed_data = {k: [] for k in preprocessed_data.keys()}
-    for elt in data:
-        json_dict = elt["topic_list"]
+    for json_dict in data:
         document_list = json_dict["meeting_transcripts"]
-        for query_dict in json_dict["general_query_list"]:
-            if "relevant_text_span" in query_dict:
-                preprocessed_data["query"] += query_dict["query"]
-                preprocessed_data["summary"] += query_dict["answer"]
-                preprocessed_data["document"] = extract_qmsum_doc(
-                    document_list, query_dict["relevant_text_span"]
-                )
+        for query_dict in json_dict["specific_query_list"]:
+            preprocessed_data["query"] += query_dict["query"]
+            preprocessed_data["summary"] += query_dict["answer"]
+            preprocessed_data["document"] = extract_qmsum_doc(
+                document_list, query_dict["relevant_text_span"]
+            )
     return data
 
 
