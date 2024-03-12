@@ -9,8 +9,8 @@ column_names:
 - answer
 files:
 - train.jsonl
-- valid.jsonl
+- val.jsonl
 - test.jsonl
-output_directory: /home/mila/c/cesare.spinoso/RSASumm/data/multioped
+output_directory: /home/mila/c/cesare.spinoso/RSASumm/data/qmsum
 write_config_directory: /home/mila/c/cesare.spinoso/RSASumm/src/data/config_instances
 finished_running: false

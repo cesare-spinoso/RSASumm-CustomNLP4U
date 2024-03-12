@@ -131,7 +131,7 @@ def qmsum_preprocess(cfg):
     for json_dict in data:
         document_list = json_dict["meeting_transcripts"]
         for query_dict in json_dict["specific_query_list"]:
-            preprocessed_data["query"] += query_dict["query"]
+            preprocessed_data["question"] += query_dict["query"]
             preprocessed_data["summary"] += query_dict["answer"]
             preprocessed_data["document"] += extract_qmsum_doc(
                 document_list, query_dict["relevant_text_span"]
@@ -148,7 +148,6 @@ def write_preprocesed_data(preprocessed_data, cfg):
 @hydra.main(
     version_base=None,
     config_path=os.path.join(SRC_DIRECTORY, "data", "conf"),
-    config_name="qmsum"
 )
 @main_decorator
 def main(run_name: str, cfg: dict):
