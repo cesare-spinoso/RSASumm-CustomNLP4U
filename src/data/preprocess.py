@@ -14,7 +14,7 @@ def covidet_preprocess(cfg):
     # Read the json file
     with open(cfg["raw_file_path"], "r") as f:
         data = json.load(f)
-    preprocessed_data = dict.fromkeys(cfg["column_name"], None)
+    preprocessed_data = dict.fromkeys(cfg["column_names"], None)
     preprocessed_data = {k: [] for k in preprocessed_data.keys()}
     for _, post_content in data.items():
         document = post_content["Reddit Post"]
