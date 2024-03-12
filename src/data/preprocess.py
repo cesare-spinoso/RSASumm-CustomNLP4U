@@ -136,7 +136,7 @@ def qmsum_preprocess(cfg):
             preprocessed_data["document"] += extract_qmsum_doc(
                 document_list, query_dict["relevant_text_span"]
             )
-    return data
+    return preprocessed_data
 
 
 def write_preprocesed_data(preprocessed_data, cfg):
