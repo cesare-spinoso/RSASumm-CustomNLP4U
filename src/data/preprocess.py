@@ -43,6 +43,22 @@ def covidet_preprocess(cfg):
     return preprocessed_data
 
 
+def multioped_preprocess(cfg):
+    # Read the csv file
+    data = pd.read_csv(cfg["raw_file_path"])
+    # Rename
+    data.rename(columns=cfg["column_mapping"], inplace=True)
+    # Add
+    current_colnames = data.columns.tolist()
+    for col in cfg["column_names"]:
+        if col not in current_colnames:
+            data[col] = None
+    # Remove
+    cols_to_drop = [col for col in current_colnames if col not in cfg["column_names"]]
+    data.drop(columns=cols_to_drop, inplace=True)
+    return data
+
+
 def debatepedia_preprocess(cfg):
     from src.data.debatepedia import DebatepediaPreprocessor
 
@@ -50,11 +66,6 @@ def debatepedia_preprocess(cfg):
     dp.run()
 
 
-def multioped_preprocess(cfg):
-    from src.data.multioped import MultiopedPreprocessor
-
-    mp = MultiopedPreprocessor(cfg)
-    mp.run()
 
 
 def write_preprocesed_data(preprocessed_data, cfg):
@@ -66,7 +77,6 @@ def write_preprocesed_data(preprocessed_data, cfg):
 @hydra.main(
     version_base=None,
     config_path=os.path.join(SRC_DIRECTORY, "data", "conf"),
-    config_name="covidet",
 )
 @main_decorator
 def main(run_name: str, cfg: dict):
