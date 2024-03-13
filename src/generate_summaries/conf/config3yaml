@@ -1,10 +1,9 @@
 dataset:
-  name: "cnn_dailymail"
-  # Use 3.0.0 since it's the same as Andreas's paper
-  version: "3.0.0"
-  split: "test"
-  source_name: "article"
-  reference_name: "highlights"
+  name: "covidet"
+  path: /home/mila/c/cesare.spinoso/RSASumm/data/covidet/preprocessed.csv
+  split: "all"
+  source_name: "document"
+  reference_name: "summary"
 tokenizer:
   name: t5-small
 model:
@@ -13,10 +12,10 @@ generation:
   batch_size: 16
   seed: 42
   generate_kwargs:
-    max_length: 150
-    do_sample: True
     num_beams: 5
-    num_return_sequences: 5
+    num_beam_groups: 5
+    diversity_penalty: 1.0
+    max_length: 150
     early_stopping: True
     output_scores: True
     return_dict_in_generate: True
