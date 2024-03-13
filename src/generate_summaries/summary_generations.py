@@ -56,7 +56,6 @@ def load_model(cfg):
 @hydra.main(
     version_base=None,
     config_path=os.path.join(SRC_DIRECTORY, "generate_summaries", "conf"),
-    config_name="config3",
 )
 @main_decorator
 def main(run_name: str, cfg: DictConfig) -> None:

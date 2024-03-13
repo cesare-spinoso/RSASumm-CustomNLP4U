@@ -1,6 +1,6 @@
 dataset:
-  name: "covidet"
-  path: /home/mila/c/cesare.spinoso/RSASumm/data/covidet/preprocessed.csv
+  name: "multioped"
+  path: /home/mila/c/cesare.spinoso/RSASumm/data/multioped/preprocessed.csv
   split: "all"
   source_name: "document"
   reference_name: "summary"

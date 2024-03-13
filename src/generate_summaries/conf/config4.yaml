@@ -1,6 +1,6 @@
 dataset:
-  name: "covidet"
-  path: /home/mila/c/cesare.spinoso/RSASumm/data/covidet/preprocessed.csv
+  name: "debatepedia"
+  path: /home/mila/c/cesare.spinoso/RSASumm/data/debatepedia/preprocessed.csv
   split: "all"
   source_name: "document"
   reference_name: "summary"

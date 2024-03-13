@@ -1,7 +1,6 @@
 dataset:
   name: cnn_dailymail
   version: 3.0.0
-  split: test
   source_name: article
   reference_name: highlights
 tokenizer:
@@ -10,15 +9,13 @@ model:
   name: t5-small
 generation:
   batch_size: 16
-  seed: 42
   generate_kwargs:
     max_length: 150
-    do_sample: true
     num_beams: 5
     num_return_sequences: 5
     early_stopping: true
     output_scores: true
     return_dict_in_generate: true
-output_directory: /network/scratch/c/cesare.spinoso/rsasumm/generate_summaries
-write_config_directory: /home/mila/c/cesare.spinoso/RSASumm/src/generate_summaries/config_instances
-finished_running: false
+output_directory: /network/scratch/c/cesare.spinoso/rsasumm/generate_data
+write_config_directory: /home/mila/c/cesare.spinoso/RSASumm/src/generate_data/config_instances
+finished_running: true

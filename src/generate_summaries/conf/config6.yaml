@@ -1,6 +1,6 @@
 dataset:
-  name: "covidet"
-  path: /home/mila/c/cesare.spinoso/RSASumm/data/covidet/preprocessed.csv
+  name: "qmsum"
+  path: /home/mila/c/cesare.spinoso/RSASumm/data/qmsum/preprocessed.csv
   split: "all"
   source_name: "document"
   reference_name: "summary"
