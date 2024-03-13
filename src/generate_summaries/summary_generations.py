@@ -87,12 +87,6 @@ def main(run_name: str, cfg: DictConfig) -> None:
         )
         # Decode and calculate scores
         num_summaries = cfg["generation"]["generate_kwargs"].get("num_return_sequences")
-        num_summaries = (
-            cfg["generation"]["generate_kwargs"].get("num_beam_groups")
-            if num_summaries is None
-            else num_summaries
-        )
-        assert num_summaries is not None
         sources = [
             s
             for s in source[i * batch_size : (i + 1) * batch_size]
