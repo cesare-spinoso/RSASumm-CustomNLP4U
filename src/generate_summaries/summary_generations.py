@@ -26,7 +26,9 @@ def get_data(cfg):
             source = dataset[split_name][source_name]
             reference = dataset[split_name][reference_name]
         else:
-            raise ValueError(f"Invalid or not implemented split {split_name} (e.g., all)")
+            raise ValueError(
+                f"Invalid or not implemented split {split_name} (e.g., all)"
+            )
     elif ds_name in ["covidet", "debatepedia", "multioped", "qmsum"]:
         ds_path = cfg["dataset"]["path"]
         dataset = pd.read_csv(ds_path)
@@ -52,7 +54,8 @@ def load_model(cfg):
 
 
 @hydra.main(
-    version_base=None, config_path=os.path.join(SRC_DIRECTORY, "generate_summaries", "conf")
+    version_base=None,
+    config_path=os.path.join(SRC_DIRECTORY, "generate_summaries", "conf"),
 )
 @main_decorator
 def main(run_name: str, cfg: DictConfig) -> None:
@@ -83,21 +86,21 @@ def main(run_name: str, cfg: DictConfig) -> None:
         )
         # Decode and calculate scores
         num_summaries = cfg["generation"]["generate_kwargs"].get("num_return_sequences")
-        num_summaries = cfg["generation"]["generate_kwargs"].get("num_beam_groups") if num_summaries is None else num_summaries
+        num_summaries = (
+            cfg["generation"]["generate_kwargs"].get("num_beam_groups")
+            if num_summaries is None
+            else num_summaries
+        )
         assert num_summaries is not None
         sources = [
             s
             for s in source[i * batch_size : (i + 1) * batch_size]
-            for _ in range(
-                cfg["generation"]["generate_kwargs"]["num_return_sequences"]
-            )
+            for _ in range(num_summaries)
         ]
         references = [
             r
             for r in reference[i * batch_size : (i + 1) * batch_size]
-            for _ in range(
-                cfg["generation"]["generate_kwargs"]["num_return_sequences"]
-            )
+            for _ in range(num_summaries)
         ]
         predictions = tokenizer.batch_decode(
             outputs["sequences"], skip_special_tokens=True
