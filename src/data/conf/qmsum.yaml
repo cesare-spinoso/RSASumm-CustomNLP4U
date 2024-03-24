@@ -1,6 +1,7 @@
 dataset_name: qmsum
 raw_data_dir_path: /home/mila/c/cesare.spinoso/RSASumm/data/qmsum/raw
 column_names:
+  - document_id
   - document
   - summary
   - emotion

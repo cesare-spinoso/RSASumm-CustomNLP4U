@@ -1,6 +1,7 @@
 dataset_name: multioped
 raw_file_path: /home/mila/c/cesare.spinoso/RSASumm/data/multioped/raw.csv
 column_names:
+  - document_id
   - document
   - summary
   - emotion
@@ -8,7 +9,7 @@ column_names:
   - question
   - answer
 column_mapping:
-  title: query
+  title: question
   replaced_text: answer
   paragraph: summary
   articles: document

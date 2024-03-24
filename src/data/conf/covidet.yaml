@@ -1,6 +1,7 @@
 dataset_name: covidet
 raw_file_path: /home/mila/c/cesare.spinoso/RSASumm/data/covidet/raw.json
 column_names:
+  - document_id
   - document
   - summary
   - emotion
@@ -8,6 +9,7 @@ column_names:
   - question
   - answer
 key_to_column_mapping:
+  document_id: Highest level key
   document: Reddit Post
   summary: Abstractive
   emotion: Emotion

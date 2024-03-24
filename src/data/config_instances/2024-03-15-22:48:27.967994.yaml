@@ -1,0 +1,18 @@
+dataset_name: multioped
+raw_file_path: /home/mila/c/cesare.spinoso/RSASumm/data/multioped/raw.csv
+column_names:
+- document_id
+- document
+- summary
+- emotion
+- topic
+- question
+- answer
+column_mapping:
+  title: question
+  replaced_text: answer
+  paragraph: summary
+  articles: document
+output_directory: /home/mila/c/cesare.spinoso/RSASumm/data/multioped
+write_config_directory: /home/mila/c/cesare.spinoso/RSASumm/src/data/config_instances
+finished_running: true

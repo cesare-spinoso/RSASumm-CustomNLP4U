@@ -1,0 +1,30 @@
+dataset:
+  name: "cnn_dailymail"
+  # Use 3.0.0 since it's the same as Andreas's paper
+  version: "3.0.0"
+  split: "test"
+  source_name: "article"
+  reference_name: "highlights"
+tokenizer:
+  name: t5-small
+model:
+  name: t5-small
+generation:
+  batch_size: 16
+  seed: 42
+  summary_type: generic
+  generate_kwargs:
+    max_length: 150
+    do_sample: True
+    num_beams: 5
+    num_return_sequences: 5
+    early_stopping: True
+    output_scores: True
+    return_dict_in_generate: True
+<<<<<<<< HEAD:src/generate_summaries/conf/config2.yaml
+output_directory: /network/scratch/c/cesare.spinoso/rsasumm/generate_summaries
+write_config_directory: /home/mila/c/cesare.spinoso/RSASumm/src/generate_summaries/config_instances
+========
+output_directory: /network/scratch/c/cesare.spinoso/rsasumm/generate_summaries/t5_generic
+write_config_directory: /home/mila/c/cesare.spinoso/RSASumm/src/generate_summaries/config_instances/t5_generic
+>>>>>>>> origin/main:src/generate_summaries/conf/t5_generic/config2.yaml
