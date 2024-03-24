@@ -13,6 +13,7 @@ query_files:
   - valid_query.txt
   - test_query.txt
 column_names:
+  - document_id
   - document
   - summary
   - emotion

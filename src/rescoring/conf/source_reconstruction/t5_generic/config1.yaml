@@ -1,0 +1,12 @@
+dataset:
+  name: cnn_dailymail
+tokenizer:
+  name: t5-small
+model:
+  name: t5-small
+rescoring:
+  type: source_reconstruction
+  batch_size: 16
+summary_jsonl_path: /home/mila/c/cesare.spinoso/RSASumm/data/generate_summaries/2024-02-09-21:31:46.230830.jsonl
+output_directory: /network/scratch/c/cesare.spinoso/rsasumm/rescoring
+write_config_directory: /home/mila/c/cesare.spinoso/RSASumm/src/rescoring/config_instances

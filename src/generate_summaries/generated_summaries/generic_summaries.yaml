@@ -1,0 +1,33 @@
+# Lists means that model did not completely finish generating
+bart_generic:
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/generate_summaries/bart_generic/2024-03-15-23:41:52.194140.jsonl
+  debatepedia: /home/mila/c/cesare.spinoso/RSASumm/data/generate_summaries/bart_generic/2024-03-16-00:07:17.892061.jsonl
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/generate_summaries/bart_generic/2024-03-16-01:16:57.173126.jsonl
+  duc_single: /home/mila/c/cesare.spinoso/RSASumm/data/generate_summaries/bart_generic/2024-03-16-01:36:51.971040.jsonl
+  covidet: /home/mila/c/cesare.spinoso/RSASumm/data/generate_summaries/bart_generic/2024-03-16-01:46:23.410092.jsonl
+led_generic:
+  covidet: /home/mila/c/cesare.spinoso/RSASumm/data/generate_summaries/led_generic/2024-03-16-02:19:11.883909.jsonl
+  debatepedia: /home/mila/c/cesare.spinoso/RSASumm/data/generate_summaries/led_generic/2024-03-16-01:14:29.719427.jsonl
+  duc_single: /home/mila/c/cesare.spinoso/RSASumm/data/generate_summaries/led_generic/2024-03-16-01:01:40.804577.jsonl
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/generate_summaries/led_generic/2024-03-15-23:53:42.192311.jsonl
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/generate_summaries/led_generic/2024-03-16-00:34:13.006348.jsonl
+llama2_generic:
+  covidet: /home/mila/c/cesare.spinoso/RSASumm/data/generate_summaries/llama2_generic/2024-03-16-10:41:19.932298.jsonl
+  debatepedia:
+  duc_single:
+    - /home/mila/c/cesare.spinoso/RSASumm/data/generate_summaries/llama2_generic/2024-03-19-19:49:00.042068.jsonl
+  multioped:
+    - /home/mila/c/cesare.spinoso/RSASumm/data/generate_summaries/llama2_generic/2024-03-21-01:12:48.160024.jsonl
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/generate_summaries/llama2_generic/2024-03-18-23:26:25.265661.jsonl
+peg_generic:
+  covidet: /home/mila/c/cesare.spinoso/RSASumm/data/generate_summaries/peg_generic/2024-03-16-01:13:31.604495.jsonl
+  debatepedia: /home/mila/c/cesare.spinoso/RSASumm/data/generate_summaries/peg_generic/2024-03-16-00:33:49.365996.jsonl
+  duc_single: /home/mila/c/cesare.spinoso/RSASumm/data/generate_summaries/peg_generic/2024-03-16-00:00:39.220284.jsonl
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/generate_summaries/peg_generic/2024-03-16-00:10:21.137893.jsonl
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/generate_summaries/peg_generic/2024-03-15-23:45:38.547520.jsonl
+t5_generic:
+  covidet: /home/mila/c/cesare.spinoso/RSASumm/data/generate_summaries/t5_generic/2024-03-16-00:58:08.370640.jsonl
+  debatepedia: /home/mila/c/cesare.spinoso/RSASumm/data/generate_summaries/t5_generic/2024-03-15-23:03:15.039264.jsonl
+  duc_single: /home/mila/c/cesare.spinoso/RSASumm/data/generate_summaries/t5_generic/2024-03-16-00:36:32.437244.jsonl
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/generate_summaries/t5_generic/2024-03-15-23:59:32.722404.jsonl
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/generate_summaries/t5_generic/2024-03-15-22:43:07.155106.jsonl

@@ -14,11 +14,15 @@ def main_decorator(func):
         cfg["finished_running"] = False
         # Pre-run commit
         run_name = datetime.now().strftime("%Y-%m-%d-%H:%M:%S.%f")
+        print(f"Running with config run name : {run_name} with config : {cfg}")
         with open(
             os.path.join(cfg["write_config_directory"], f"{run_name}.yaml"), "w"
         ) as f:
             OmegaConf.save(cfg, f)
-        commit(cwd=SRC_DIRECTORY, msg=f"Pre-run commit for : {run_name}")
+        if "commit" in cfg and not cfg["commit"]:
+            print("Skipping commit")
+        else:
+            commit(cwd=SRC_DIRECTORY, msg=f"Pre-run commit for : {run_name}")
         # Run the main function
         func(run_name, cfg)
         # Post-run commit
@@ -27,6 +31,9 @@ def main_decorator(func):
             os.path.join(cfg["write_config_directory"], f"{run_name}.yaml"), "w"
         ) as f:
             OmegaConf.save(cfg, f)
-        commit(cwd=SRC_DIRECTORY, msg=f"Post-run commit for : {run_name}")
+        if "commit" in cfg and not cfg["commit"]:
+            print("Skipping commit")
+        else:
+            commit(cwd=SRC_DIRECTORY, msg=f"Post-run commit for : {run_name}")
 
     return wrapper

@@ -1,0 +1,30 @@
+bart_generic:
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/bart_generic/2024-03-18-20:37:57.459428.jsonl
+  debatepedia: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/bart_generic/2024-03-18-21:06:11.828903.jsonl
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/bart_generic/2024-03-18-21:44:45.284158.jsonl
+  duc_single: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/bart_generic/2024-03-18-22:02:18.339913.jsonl
+  covidet: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/bart_generic/2024-03-18-22:14:05.051838.jsonl
+led_generic:
+  covidet: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/led_generic/2024-03-18-22:26:40.280410.jsonl
+  debatepedia: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/led_generic/2024-03-18-21:44:34.329202.jsonl
+  duc_single: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/led_generic/2024-03-18-21:32:00.050724.jsonl
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/led_generic/2024-03-18-20:39:05.005310.jsonl
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/led_generic/2024-03-18-21:10:57.780410.jsonl
+llama2_generic:
+  covidet: 
+  debatepedia:
+  duc_single:
+  multioped:
+  qmsum: 
+peg_generic:
+  covidet: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/peg_generic/2024-03-18-21:56:53.191444.jsonl
+  debatepedia: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/peg_generic/2024-03-18-21:22:57.252724.jsonl
+  duc_single: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/peg_generic/2024-03-18-23:45:07.654315.jsonl
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/peg_generic/2024-03-18-20:56:07.465959.jsonl
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/peg_generic/2024-03-18-20:40:06.423046.jsonl
+t5_generic:
+  covidet: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/t5_generic/2024-03-18-22:31:56.916763.jsonl
+  debatepedia: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/t5_generic/2024-03-18-21:12:14.102232.jsonl
+  duc_single: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/t5_generic/2024-03-18-22:14:26.576652.jsonl
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/t5_generic/2024-03-18-21:47:35.707870.jsonl
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/t5_generic/2024-03-18-20:55:55.689676.jsonl

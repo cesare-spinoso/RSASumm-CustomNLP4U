@@ -1,0 +1,24 @@
+summarizer_name: bart_generic
+datasets:
+  covidet: /home/mila/c/cesare.spinoso/RSASumm/data/covidet/preprocessed.csv
+  debatepedia: /home/mila/c/cesare.spinoso/RSASumm/data/debatepedia/preprocessed.csv
+  duc_single: /home/mila/c/cesare.spinoso/RSASumm/data/duc/duc_single/preprocessed.csv
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/multioped/preprocessed.csv
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/qmsum/preprocessed.csv
+generated_summaries_yaml: /home/mila/c/cesare.spinoso/RSASumm/src/generate_summaries/generated_summaries/generic_summaries.yaml
+source_reconstruction_yaml: /home/mila/c/cesare.spinoso/RSASumm/src/rescoring/rescored_summaries/source_reconstruction.yaml
+latent_reconstruction_yaml: /home/mila/c/cesare.spinoso/RSASumm/src/rescoring/rescored_summaries/latent_reconstruction.yaml
+metric: rouge
+summary_reference_pairing: doc_and_latent
+multiple_references: take_max
+rename_score_columns: true
+evaluations:
+- best
+- random
+- direct
+- source_reconstruction
+- latent_reconstruction
+write_config_directory: /home/mila/c/cesare.spinoso/RSASumm/src/evaluation/config_instances/generic_summaries
+output_directory: /network/scratch/c/cesare.spinoso/rsasumm/evaluation/generic_summaries
+commit: false
+finished_running: true

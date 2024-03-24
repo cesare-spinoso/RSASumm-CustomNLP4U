@@ -162,3 +162,4 @@ cython_debug/
 # Custom
 outputs/
 cluster_scripts/
+scrap_work/

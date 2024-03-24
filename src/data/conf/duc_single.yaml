@@ -1,0 +1,17 @@
+# Even though DUC is a multi-doc summarization task, sub-sample and treat it as a single-doc summarization task
+dataset_name: duc_single
+manual_annotation_dir_path: /home/mila/c/cesare.spinoso/RSASumm/data/duc/DUC/2007/mainEval/manual/peers
+source_files_dir_path: /home/mila/c/cesare.spinoso/RSASumm/data/duc/DUC/2007/duc2007_testdocs/main
+topics_file_path: /home/mila/c/cesare.spinoso/RSASumm/data/duc/DUC/2007/duc2007_topics.xml
+n_source_docs: 1
+n_ref_summs: 1
+column_names:
+  - document_id
+  - document
+  - summary
+  - emotion
+  - topic
+  - question
+  - answer
+output_directory: /home/mila/c/cesare.spinoso/RSASumm/data/duc/duc_single
+write_config_directory: /home/mila/c/cesare.spinoso/RSASumm/src/data/config_instances
