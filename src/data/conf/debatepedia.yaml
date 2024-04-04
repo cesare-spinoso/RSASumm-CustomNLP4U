@@ -1,17 +1,17 @@
 dataset_name: debatepedia
 raw_data_dir_path: /home/mila/c/cesare.spinoso/RSASumm/data/debatepedia/raw
 content_files:
-  - train_content.txt
+  # - train_content.txt
   - valid_content.txt
-  - test_content.txt
+  # - test_content.txt
 summary_files:
-  - train_summary.txt
+  # - train_summary.txt
   - valid_summary.txt
-  - test_summary.txt
+  # - test_summary.txt
 query_files:
-  - train_query.txt
+  # - train_query.txt
   - valid_query.txt
-  - test_query.txt
+  # - test_query.txt
 column_names:
   - document_id
   - document
@@ -20,5 +20,7 @@ column_names:
   - topic
   - question
   - answer
+data_split: val
 output_directory: /home/mila/c/cesare.spinoso/RSASumm/data/debatepedia
 write_config_directory: /home/mila/c/cesare.spinoso/RSASumm/src/data/config_instances
+commit: false

@@ -1,0 +1,10 @@
+yaml_file_path: /home/mila/c/cesare.spinoso/RSASumm/src/generate_summaries/generated_summaries/generic_summaries.yaml
+diversity_metric: LCS
+filter_datasets:
+  covidet: /home/mila/c/cesare.spinoso/RSASumm/data/covidet/test.csv
+  debatepedia: /home/mila/c/cesare.spinoso/RSASumm/data/debatepedia/test.csv
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/multioped/test.csv
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/qmsum/test.csv
+write_config_directory: /home/mila/c/cesare.spinoso/RSASumm/src/summary_statistics/config_instances/summary_diversity
+output_directory: /home/mila/c/cesare.spinoso/RSASumm/data/summary_statistics/summary_diversity
+finished_running: true

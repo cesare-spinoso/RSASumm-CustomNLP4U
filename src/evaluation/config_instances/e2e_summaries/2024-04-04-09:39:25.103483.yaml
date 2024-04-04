@@ -1,0 +1,23 @@
+summarizer_name: llama2_e2e
+datasets:
+  covidet: /home/mila/c/cesare.spinoso/RSASumm/data/covidet/test.csv
+  debatepedia: /home/mila/c/cesare.spinoso/RSASumm/data/debatepedia/test.csv
+  duc_single: /home/mila/c/cesare.spinoso/RSASumm/data/duc/duc_single/preprocessed.csv
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/multioped/test.csv
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/qmsum/test.csv
+merged_rescores_yaml: /home/mila/c/cesare.spinoso/RSASumm/src/rescoring/merged_rescores/merged_rescores.yaml
+metric: rouge
+evaluations:
+- random
+- best
+- direct
+- source_reconstruction
+- latent_reconstruction
+- weighted_rsa
+ensure_common_denom: true
+lambda_interval: 0.1
+alpha_interval: 0.1
+write_config_directory: /home/mila/c/cesare.spinoso/RSASumm/src/evaluation/config_instances/e2e_summaries
+output_directory: /network/scratch/c/cesare.spinoso/rsasumm/evaluation/e2e_summaries
+commit: false
+finished_running: true

@@ -1,9 +1,11 @@
-import jsonlines
 import os
-
 from itertools import product
-from tqdm import tqdm
+
+import pandas as pd
+import json
+import jsonlines
 import yaml
+from tqdm import tqdm
 
 # JSON/JSONLINES Helpers
 
@@ -61,45 +63,34 @@ def rename_jsonlines_keys(original_keys, new_keys, jsonlines_data):
     return new_jsonlines_data
 
 
-def merge_jsonlines_data(common_keys, jsonlines_data):
-    # Filter based on common keys
-    common_keys_data = []
-    for jsonlines_file in jsonlines_data:
-        data = []
-        for elt in jsonlines_file:
-            data.append(tuple([elt[k] for k in common_keys]))
-        data = set(data)
-        common_keys_data.append(data)
-    intersect_keys_data = set.intersection(*common_keys_data)
-    print(
-        f"You had {len(intersect_keys_data)} common keys"
-        + f" when the max was {max([len(k) for k in common_keys_data])}"
-    )
+def merge_jsonlines_data(jsonlines_paths):
+    jsonlines_data = []
+    for jsonlines_path in jsonlines_paths:
+        jsonlines_data.extend(read_jsonlines(jsonlines_path))
     merged_jsonlines_data = []
-    for key_data in tqdm(intersect_keys_data):
-        starting_dict = dict(zip(common_keys, key_data))
-        possible_combinations = product(
-            *[
-                filter_jsonlines(
-                    keys=common_keys,
-                    values=key_data,
-                    jsonlines_data=j,
-                    remove_keys=True,
-                )
-                for j in jsonlines_data
-            ]
-        )
-        for elt in possible_combinations:
-            merged_jsonlines_data.append(
-                {
-                    **starting_dict,
-                    **{k: v for sub_dict in elt for k, v in sub_dict.items()},
-                }
-            )
+    for elt in jsonlines_data:
+        if elt not in merged_jsonlines_data:
+            merged_jsonlines_data.append(elt)
     return merged_jsonlines_data
 
 
+def write_json_file(dict_to_write, output_directory, run_name):
+    with open(os.path.join(output_directory, f"{run_name}.json"), "w") as f:
+        json.dump(dict_to_write, f, indent=4)
+
+
+def read_json_file(file_path):
+    with open(file_path, "r") as f:
+        return json.load(f)
+
+
 # YAML Helpers
+
+
+def read_yaml(yaml_file_path):
+    with open(yaml_file_path, "r") as f:
+        yaml_contents = yaml.safe_load(f)
+    return yaml_contents
 
 
 def key_index_dict(ordered_keys, dictionary):
@@ -117,3 +108,11 @@ def get_jsonl_path_from_yaml(ordered_keys, yaml_path):
         except yaml.YAMLError as exc:
             print(exc)
     return key_index_dict(ordered_keys, yaml_contents)
+
+
+def yaml_to_df(yaml_file_path):
+    yaml_contents = read_yaml(yaml_file_path)
+    data = {}
+    for k, vdict in yaml_contents.items():
+        data[k] = ["/".join(["" if v is None else f"{v:.3f}" for v in vdict.values()])]
+    return pd.DataFrame(data)

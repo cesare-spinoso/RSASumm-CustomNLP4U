@@ -5,15 +5,19 @@ datasets:
   duc_single: /home/mila/c/cesare.spinoso/RSASumm/data/duc/duc_single/preprocessed.csv
   multioped: /home/mila/c/cesare.spinoso/RSASumm/data/multioped/preprocessed.csv
   qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/qmsum/preprocessed.csv
-merged_summaries_dir: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/merge_rescores/
+merged_summaries_dir: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/merge_rescores/2024-03-24-18:34:17.256365_filtered
 metric: rouge
 multiple_references: take_max
 evaluations:
-  - best
-  - random
-  - direct
-  - source_reconstruction
-  - latent_reconstruction
+  # - random
+  # - best
+  # - direct
+  # - source_reconstruction
+  # - latent_reconstruction
+  # - weighted_rsa
+  - system_output
+ensure_common_denom: true
+lambda_interval: 0.1
+alpha_interval: 0.1
 write_config_directory: /home/mila/c/cesare.spinoso/RSASumm/src/evaluation/config_instances/generic_summaries
 output_directory: /network/scratch/c/cesare.spinoso/rsasumm/evaluation/generic_summaries
-commit: false

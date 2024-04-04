@@ -1,5 +1,6 @@
 import json
 import os
+import random
 from xml.etree import ElementTree as ET
 
 import hydra
@@ -54,8 +55,6 @@ def multioped_preprocess(cfg):
     # opposing opinions for a given question
     # Read the csv file
     data = pd.read_csv(cfg["raw_file_path"])
-    # Remove nans and rows which have non-sting values
-    data = data.dropna()
     # Rename
     data.rename(columns=cfg["column_mapping"], inplace=True)
     # Add
@@ -66,9 +65,6 @@ def multioped_preprocess(cfg):
     # Remove
     cols_to_drop = [col for col in current_colnames if col not in cfg["column_names"]]
     data.drop(columns=cols_to_drop, inplace=True)
-    # Remove columns which don't have strings in column_mapping
-    for col_to_check in cfg["column_mapping"].values():
-        data = data[data[col_to_check].apply(lambda x: isinstance(x, str))]
     return data
 
 
@@ -110,6 +106,9 @@ def debatepedia_preprocess(cfg):
             "topic": topics,
         }
     )
+    # Filter for missing questions
+    data = data.dropna()
+    data = data[data["query"].apply(lambda x: x != "")]
     column_names = data.columns.tolist()
     for col in cfg["column_names"]:
         if col not in column_names:
@@ -272,14 +271,65 @@ def add_document_ids(df):
     return df
 
 
+def split_data(data, dataset_name, split):
+    if dataset_name == "multioped":
+        # NOTE: Some documents missing entries are dropped at the end
+        # The original authors don't do this
+        original_document_ids = [i for i in range(0, 2794, 2)]
+        random.Random(4).shuffle(original_document_ids)
+        n_sample = len(original_document_ids)
+        if split == "train":
+            split_document_ids = original_document_ids[: (n_sample * 7) // 10]
+        elif split == "val":
+            split_document_ids = original_document_ids[
+                (n_sample * 7) // 10 : (n_sample * 8) // 10
+            ]
+        else:
+            split_document_ids = original_document_ids[(n_sample * 8) // 10 :]
+        # Add the odd document ids
+        split_document_ids = [i + j for i in split_document_ids for j in [0, 1]]
+        data = data[data.index.isin(split_document_ids)]
+        assert len(data) == len(split_document_ids)
+        return data
+    else:
+        raise ValueError(f"Cannot split data for {dataset_name} dataset")
+
+
+def prostprocess_multioped(preprocessed_data, cfg):
+    if "data_split" in cfg:
+        preprocessed_data = split_data(
+            preprocessed_data, dataset_name="multioped", split=cfg["data_split"]
+        )
+    # Remove columns which don't have strings in column_mapping
+    for col_to_check in cfg["column_mapping"].values():
+        preprocessed_data = preprocessed_data[~preprocessed_data[col_to_check].isna()]
+        preprocessed_data = preprocessed_data[
+            preprocessed_data[col_to_check].apply(lambda x: isinstance(x, str))
+        ]
+    return preprocessed_data
+
+
 def write_preprocesed_data(preprocessed_data, cfg):
-    path_to_write = os.path.join(cfg["output_directory"], "preprocessed.csv")
     if not isinstance(preprocessed_data, pd.DataFrame):
         preprocessed_data = pd.DataFrame(preprocessed_data)
     # Sort the column names
-    preprocessed_data = preprocessed_data.reindex(sorted(preprocessed_data.columns), axis=1)
+    preprocessed_data = preprocessed_data.reindex(
+        sorted(preprocessed_data.columns), axis=1
+    )
     # Populate document ids if not done yet
     preprocessed_data = add_document_ids(preprocessed_data)
+    # Sort rows by document id
+    preprocessed_data = preprocessed_data.sort_values(by="document_id")
+    # Special postprocessing for multioped
+    if cfg["dataset_name"] == "multioped":
+        preprocessed_data = prostprocess_multioped(preprocessed_data, cfg)
+    # Write to csv
+    if "data_split" in cfg:
+        path_to_write = os.path.join(
+            cfg["output_directory"], f"{cfg['data_split']}.csv"
+        )
+    else:
+        path_to_write = os.path.join(cfg["output_directory"], "preprocessed.csv")
     preprocessed_data.to_csv(path_to_write, index=False)
 
 

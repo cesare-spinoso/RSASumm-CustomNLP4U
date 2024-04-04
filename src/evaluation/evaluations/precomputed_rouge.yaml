@@ -1,0 +1,8 @@
+bart_generic:
+led_generic:
+llama2_generic:
+peg_generic:
+t5_generic:
+bart_e2e: /home/mila/c/cesare.spinoso/RSASumm/data/evaluation/e2e_summaries/2024-04-03-16:27:16.457252.json
+led_e2e: /home/mila/c/cesare.spinoso/RSASumm/data/evaluation/e2e_summaries/2024-04-02-11:00:35.661643.json
+llama2_e2e: /home/mila/c/cesare.spinoso/RSASumm/data/evaluation/e2e_summaries/2024-04-02-10:47:56.111964.json

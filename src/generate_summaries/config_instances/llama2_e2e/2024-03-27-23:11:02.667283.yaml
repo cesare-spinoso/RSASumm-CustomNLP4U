@@ -1,0 +1,48 @@
+dataset:
+  name: qmsum
+  path: /home/mila/c/cesare.spinoso/RSASumm/data/qmsum/test.csv
+  source_name: document
+  question_name: question
+  reference_name: summary
+  document_id_name: document_id
+tokenizer:
+  name: meta-llama/Llama-2-7b-chat-hf
+  maximum_length: 4096
+model:
+  name: meta-llama/Llama-2-7b-chat-hf
+prompt_template: '<s>[INST] <<SYS>>
+
+  You are a helpful, respectful and honest assistant specializing in summarization.
+  Provide the best summary you can while answering the question provided to you.
+
+  <</SYS>>
+
+  Question:
+
+  {q}
+
+  Text:
+
+  {s}
+
+  Summary: [/INST]'
+generation:
+  batch_size: 1
+  summary_type: e2e
+  seed: 42
+  generate_kwargs:
+    num_beams: 5
+    num_beam_groups: 5
+    num_return_sequences: 5
+    diversity_penalty: 1.0
+    do_sample: false
+    max_new_tokens: 300
+    temperature: null
+    top_p: null
+    early_stopping: true
+    output_scores: true
+    return_dict_in_generate: true
+output_directory: /network/scratch/c/cesare.spinoso/rsasumm/generate_summaries/llama2_e2e/qmsum
+write_config_directory: /home/mila/c/cesare.spinoso/RSASumm/src/generate_summaries/config_instances/llama2_e2e
+commit: false
+finished_running: true

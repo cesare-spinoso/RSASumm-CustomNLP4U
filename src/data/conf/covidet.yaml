@@ -1,5 +1,5 @@
 dataset_name: covidet
-raw_file_path: /home/mila/c/cesare.spinoso/RSASumm/data/covidet/raw.json
+raw_file_path: /home/mila/c/cesare.spinoso/RSASumm/data/covidet/val.json
 column_names:
   - document_id
   - document
@@ -16,5 +16,6 @@ key_to_column_mapping:
   topic: null
   question: null
   answer: null
+data_split: val
 output_directory: /home/mila/c/cesare.spinoso/RSASumm/data/covidet
 write_config_directory: /home/mila/c/cesare.spinoso/RSASumm/src/data/config_instances

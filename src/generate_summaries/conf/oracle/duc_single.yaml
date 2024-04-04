@@ -1,0 +1,11 @@
+dataset:
+  name: duc_single
+  path: /home/mila/c/cesare.spinoso/RSASumm/data/duc/duc_single/preprocessed.csv
+  source_name: document
+  reference_name: summary
+  document_id_name: document_id
+summary_type: max_sentence_rouge
+greedy_size: 3
+output_directory: /network/scratch/c/cesare.spinoso/rsasumm/generate_summaries/oracle
+write_config_directory: /home/mila/c/cesare.spinoso/RSASumm/src/generate_summaries/config_instances/oracle
+

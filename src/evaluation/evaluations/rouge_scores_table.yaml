@@ -1,0 +1,11 @@
+# For this iteration, debatepedia and multioped have very small common denominators (29 and 16)
+bart_generic: /home/mila/c/cesare.spinoso/RSASumm/data/evaluation/generic_summaries/2024-04-03-20:32:39.294779_merged.json
+  # - /home/mila/c/cesare.spinoso/RSASumm/data/evaluation/generic_summaries/2024-04-03-20:32:39.294779.json
+  # - /home/mila/c/cesare.spinoso/RSASumm/data/evaluation/generic_summaries/2024-04-03-21:19:21.952816.json
+led_generic: /home/mila/c/cesare.spinoso/RSASumm/data/evaluation/generic_summaries/2024-04-03-22:11:36.388652.json
+llama2_generic: /home/mila/c/cesare.spinoso/RSASumm/data/evaluation/generic_summaries/2024-04-03-23:27:44.135966.json
+peg_generic: /home/mila/c/cesare.spinoso/RSASumm/data/evaluation/generic_summaries/2024-04-03-22:48:32.353749.json
+t5_generic: /home/mila/c/cesare.spinoso/RSASumm/data/evaluation/generic_summaries/2024-04-03-21:33:17.501195.json
+bart_e2e: /home/mila/c/cesare.spinoso/RSASumm/data/evaluation/e2e_summaries/2024-04-04-10:07:13.550494.json
+led_e2e: /home/mila/c/cesare.spinoso/RSASumm/data/evaluation/e2e_summaries/2024-04-04-10:36:58.213737.json
+llama2_e2e: /home/mila/c/cesare.spinoso/RSASumm/data/evaluation/e2e_summaries/2024-04-04-09:39:25.103483.json

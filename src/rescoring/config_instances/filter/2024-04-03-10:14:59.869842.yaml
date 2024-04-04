@@ -1,0 +1,13 @@
+datasets:
+  covidet: /home/mila/c/cesare.spinoso/RSASumm/data/covidet/test.csv
+  debatepedia: /home/mila/c/cesare.spinoso/RSASumm/data/debatepedia/test.csv
+  duc_single: /home/mila/c/cesare.spinoso/RSASumm/data/duc/duc_single/preprocessed.csv
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/multioped/test.csv
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/qmsum/test.csv
+merged_rescores:
+  bart_e2e: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/merge_rescores/2024-04-02-09:56:23.085745
+  led_e2e: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/merge_rescores/2024-04-02-10:27:56.615451
+  llama2_e2e: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/merge_rescores/2024-04-02-10:28:32.547098
+write_config_directory: /home/mila/c/cesare.spinoso/RSASumm/src/rescoring/config_instances/filter
+output_directory: /network/scratch/c/cesare.spinoso/rsasumm/rescoring/merge_rescores
+finished_running: true

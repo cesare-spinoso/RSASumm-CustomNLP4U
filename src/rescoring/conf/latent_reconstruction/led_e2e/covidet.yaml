@@ -1,0 +1,14 @@
+dataset_name: covidet
+summarizer_name: led_e2e
+question_template: Describe the {emotion} of this post.
+tokenizer:
+  name: google/flan-t5-large
+model:
+  name: google/flan-t5-large
+rescoring:
+  type: latent_reconstruction
+  preprocessed_dataset_path: /home/mila/c/cesare.spinoso/RSASumm/data/covidet/test.csv
+  generated_summaries_yaml: /home/mila/c/cesare.spinoso/RSASumm/src/generate_summaries/generated_summaries/e2e_summaries.yaml
+  batch_size: 64
+output_directory: /network/scratch/c/cesare.spinoso/rsasumm/rescoring
+write_config_directory: /home/mila/c/cesare.spinoso/RSASumm/src/rescoring/config_instances/latent_reconstruction/led_e2e

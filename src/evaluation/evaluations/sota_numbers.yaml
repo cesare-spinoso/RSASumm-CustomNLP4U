@@ -1,0 +1,20 @@
+covidet:
+  rouge1: 0.2619
+  rouge2: 0.0685
+  rougeL: 0.1786
+debatepedia:
+  rouge1: 0.236
+  rouge2: 0.076
+  rougeL: 0.21
+duc_single:
+  rouge1:
+  rouge2:
+  rougeL:
+multioped:
+  rouge1: 0.315
+  rouge2: 0.138
+  rougeL: 0.298
+qmsum:
+  rouge1: 0.535
+  rouge2: 0.263
+  rougeL: 0.329

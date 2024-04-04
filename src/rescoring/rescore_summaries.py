@@ -1,18 +1,18 @@
 import os
+import warnings
 
 import hydra
-import jsonlines
 import pandas as pd
 import torch
 import yaml
+from hydra.core.hydra_config import HydraConfig
 from omegaconf import DictConfig
 from tqdm import tqdm
 from transformers import T5ForConditionalGeneration, T5Tokenizer
-from hydra.core.hydra_config import HydraConfig
 
-from src import SRC_DIRECTORY, SCRATCH_CACHE_DIR
+from src import SCRATCH_CACHE_DIR, SRC_DIRECTORY
 from src.utils.decorators import main_decorator
-from src.utils.helper import append_jsonlines
+from src.utils.helper import append_jsonlines, read_jsonlines
 
 
 def sanity_check_config(cfg):
@@ -80,13 +80,15 @@ def get_summary_jsonl(cfg):
     summary_jsonl_path = generated_summaries[cfg["summarizer_name"]][
         cfg["dataset_name"]
     ]
-    with jsonlines.open(summary_jsonl_path) as reader:
-        for obj in reader:
-            summary_jsonl_data.append(obj)
+    if isinstance(summary_jsonl_path, str):
+        summary_jsonl_data = read_jsonlines(summary_jsonl_path)
+    else:
+        for jsonl_path in summary_jsonl_path:
+            summary_jsonl_data += read_jsonlines(jsonl_path)
     return summary_jsonl_data
 
 
-def get_latent_rec_values(summary_jsonl_data, cfg):
+def generic_latent_rec_values(summary_jsonl_data, cfg):
     # Read from jsonl and csv and check that values are consistent
     document_ids = [obj["document_id"] for obj in summary_jsonl_data]
     source = [obj["source"] for obj in summary_jsonl_data]
@@ -96,7 +98,8 @@ def get_latent_rec_values(summary_jsonl_data, cfg):
     df = pd.read_csv(cfg["rescoring"]["preprocessed_dataset_path"])
     set_doc_ids = set(document_ids)
     set_source = set(source)
-    assert len(set_doc_ids) == len(set_source), print(set_doc_ids, set_source)
+    if len(set_doc_ids) != len(set_source):
+        warnings.warn(f"{len(set_doc_ids)=} and {len(set_source)=}")
     assert set_doc_ids <= set(df["document_id"].values.tolist()) and set_source <= set(
         df["document"].values.tolist()
     )
@@ -110,6 +113,42 @@ def get_latent_rec_values(summary_jsonl_data, cfg):
             output.append((doc_id, s, p, latent))
     assert all(len(o) == len(output[0]) for o in output)
     return ([o[i] for o in output] for i in range(len(output[0])))
+
+
+def e2e_latent_rec_values(summary_jsonl_data, cfg):
+    # This assumes there is a one-to-one correspondence between
+    # the question given to the e2e model and the latent for each dataset
+    latent_column_name = get_latent_column_name(cfg["dataset_name"])
+    document_ids = [obj["document_id"] for obj in summary_jsonl_data]
+    source = [obj["source"] for obj in summary_jsonl_data]
+    pred = [obj["pred"] for obj in summary_jsonl_data]
+    question = [obj["question"] for obj in summary_jsonl_data]
+    # Merge with the raw dataframe to get the latent
+    df_raw = pd.read_csv(cfg["rescoring"]["preprocessed_dataset_path"])
+    if "covidet" == cfg["dataset_name"]:
+        df_raw["question"] = df_raw["emotion"].apply(
+            lambda x: cfg["question_template"].format(emotion=x)
+        )
+    if "debatepedia" == cfg["dataset_name"]:
+        df_raw["question"] = df_raw["query"]
+    question_to_latent = dict(
+        zip(
+            df_raw["question"].tolist(),
+            df_raw[latent_column_name],
+        )
+    )
+    latent = [question_to_latent[q] for q in question]
+    assert len(document_ids) == len(source) == len(pred) == len(latent)
+    return document_ids, source, pred, latent
+
+
+def get_latent_rec_values(summary_jsonl_data, cfg):
+    if "generic" in cfg["summarizer_name"]:
+        return generic_latent_rec_values(summary_jsonl_data, cfg)
+    elif "e2e" in cfg["summarizer_name"]:
+        return e2e_latent_rec_values(summary_jsonl_data, cfg)
+    else:
+        raise ValueError("Summarizer name not recognized")
 
 
 def get_source_rec_values(summary_jsonl_data, cfg):
@@ -132,15 +171,13 @@ def get_source_rec_values(summary_jsonl_data, cfg):
         documents = set(df["document"].values.tolist())
         set_doc_ids = set(doc_ids)
         set_rec_target = set(rec_target)
-        assert len(set_doc_ids) == len(set_rec_target), print(
-            set_doc_ids, set_rec_target
-        )
+        if len(set_doc_ids) != len(set_rec_target):
+            warnings.warn(f"{len(set_doc_ids)=} and {len(set_rec_target)=}")
         assert set_doc_ids <= document_ids and set_rec_target <= documents, print(
             set_doc_ids, set_rec_target, document_ids, documents
         )
     elif cfg["summarizer_name"] == "oracle":
         raise NotImplementedError("Oracle implementation not done yet")
-        assert "Will be different than the one above"
     else:
         raise ValueError("Summarizer name not recognized")
     return doc_ids, rec_input, rec_target
@@ -191,16 +228,15 @@ def compute_conditional_likelihoods(
 
 
 def get_likelihood_scores(
-    model, tokenizer, batch_size, targets_tokenized, input_tokenized
+    model, tokenizer, is_last_batch, batch_size, targets_tokenized, input_tokenized
 ):
     with torch.no_grad():
         unnormalized_logits = model(
             input_ids=input_tokenized, labels=targets_tokenized
         ).logits.to("cpu")
         # expect (batch_size, seq_len, vocab_size)
-    assert (
-        len(unnormalized_logits.shape) == 3
-        and unnormalized_logits.shape[0] == batch_size
+    assert len(unnormalized_logits.shape) == 3 and (
+        is_last_batch or unnormalized_logits.shape[0] == batch_size
     )
     conditional_likelihoods = compute_conditional_likelihoods(
         unnormalized_logits,
@@ -228,7 +264,9 @@ def compute_source_reconstruction(run_name, cfg):
     # Compute reconstruction
     # Run in batches
     batch_size = cfg["rescoring"]["batch_size"]
-    num_batches = len(rec_target) // batch_size
+    num_batches = len(rec_target) // batch_size + (
+        0 if len(rec_target) % batch_size == 0 else 1
+    )
     for i in tqdm(range(num_batches)):
         s = slice(i * batch_size, (i + 1) * batch_size)
         batch_doc_ids = doc_ids[s]
@@ -253,6 +291,7 @@ def compute_source_reconstruction(run_name, cfg):
         conditional_likelihoods, avg_conditional_likelihoods = get_likelihood_scores(
             model=model,
             tokenizer=tokenizer,
+            is_last_batch=(num_batches - 1 == i),
             batch_size=batch_size,
             targets_tokenized=targets_tokenized,
             input_tokenized=input_tokenized,
@@ -266,7 +305,7 @@ def compute_source_reconstruction(run_name, cfg):
                 "reconstruction_score": conditional_likelihoods[i],
                 "avg_reconstruction_score": avg_conditional_likelihoods[i],
             }
-            for i in range(batch_size)
+            for i in range(len(batch_doc_ids))
         ]
         output_directory = os.path.join(
             cfg["output_directory"], cfg["rescoring"]["type"], cfg["summarizer_name"]
@@ -285,7 +324,9 @@ def compute_latent_reconstruction(run_name, cfg):
     )
     # Run in batches
     batch_size = cfg["rescoring"]["batch_size"]
-    num_batches = len(doc_ids) // batch_size
+    num_batches = len(doc_ids) // batch_size + (
+        0 if len(doc_ids) % batch_size == 0 else 1
+    )
     for i in tqdm(range(num_batches)):
         s = slice(i * batch_size, (i + 1) * batch_size)
         batch_doc_ids = doc_ids[s]
@@ -301,6 +342,7 @@ def compute_latent_reconstruction(run_name, cfg):
         conditional_likelihoods, avg_conditional_likelihoods = get_likelihood_scores(
             model=model,
             tokenizer=tokenizer,
+            is_last_batch=(num_batches - 1 == i),
             batch_size=batch_size,
             targets_tokenized=targets_tokenized,
             input_tokenized=input_tokenized,
@@ -315,7 +357,7 @@ def compute_latent_reconstruction(run_name, cfg):
                 "reconstruction_score": conditional_likelihoods[i],
                 "avg_reconstruction_score": avg_conditional_likelihoods[i],
             }
-            for i in range(batch_size)
+            for i in range(len(batch_doc_ids))
         ]
         output_directory = os.path.join(
             cfg["output_directory"], cfg["rescoring"]["type"], cfg["summarizer_name"]
@@ -327,13 +369,14 @@ def compute_latent_reconstruction(run_name, cfg):
     version_base=None,
     config_path=os.path.join(
         SRC_DIRECTORY, "rescoring", "conf"
-    ),
+    )
 )
 @main_decorator
 def main(run_name: str, cfg: DictConfig):
     sanity_check_config(cfg)
     if cfg["rescoring"]["type"] == "source_reconstruction":
         compute_source_reconstruction(run_name, cfg)
+    # TODO: Add option if prediction was also conditioned on latent
     elif cfg["rescoring"]["type"] == "latent_reconstruction":
         compute_latent_reconstruction(run_name, cfg)
     elif cfg["rescoring"]["type"] == "qa_rescoring":

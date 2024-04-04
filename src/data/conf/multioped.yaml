@@ -13,5 +13,7 @@ column_mapping:
   replaced_text: answer
   paragraph: summary
   articles: document
+# data_split: val
 output_directory: /home/mila/c/cesare.spinoso/RSASumm/data/multioped
 write_config_directory: /home/mila/c/cesare.spinoso/RSASumm/src/data/config_instances
+commit: false

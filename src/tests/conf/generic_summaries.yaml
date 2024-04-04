@@ -1,0 +1,3 @@
+generated_summaries_yaml: /home/mila/c/cesare.spinoso/RSASumm/src/generate_summaries/generated_summaries/generic_summaries.yaml
+source_reconstruction_yaml: /home/mila/c/cesare.spinoso/RSASumm/src/rescoring/rescored_summaries/source_reconstruction.yaml
+latent_reconstruction_yaml: /home/mila/c/cesare.spinoso/RSASumm/src/rescoring/rescored_summaries/latent_reconstruction.yaml

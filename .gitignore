@@ -163,3 +163,4 @@ cython_debug/
 outputs/
 cluster_scripts/
 scrap_work/
+.vscode/

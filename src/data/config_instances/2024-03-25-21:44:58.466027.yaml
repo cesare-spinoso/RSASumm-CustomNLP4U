@@ -1,0 +1,20 @@
+dataset_name: debatepedia
+raw_data_dir_path: /home/mila/c/cesare.spinoso/RSASumm/data/debatepedia/raw
+content_files:
+- train_content.txt
+summary_files:
+- train_summary.txt
+query_files:
+- train_query.txt
+column_names:
+- document_id
+- document
+- summary
+- emotion
+- topic
+- question
+- answer
+data_split: train
+output_directory: /home/mila/c/cesare.spinoso/RSASumm/data/debatepedia
+write_config_directory: /home/mila/c/cesare.spinoso/RSASumm/src/data/config_instances
+finished_running: true
