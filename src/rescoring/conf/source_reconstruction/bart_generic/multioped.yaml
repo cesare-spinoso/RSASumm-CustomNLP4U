@@ -8,6 +8,7 @@ rescoring:
   type: source_reconstruction
   preprocessed_dataset_path: /home/mila/c/cesare.spinoso/RSASumm/data/multioped/preprocessed.csv
   generated_summaries_yaml: /home/mila/c/cesare.spinoso/RSASumm/src/generate_summaries/generated_summaries/generic_summaries.yaml
+  rescored_summaries_jsonl_path: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/bart_generic/2024-03-18-20:37:57.459428.jsonl
   batch_size: 32
 output_directory: /network/scratch/c/cesare.spinoso/rsasumm/rescoring
 write_config_directory: /home/mila/c/cesare.spinoso/RSASumm/src/rescoring/config_instances/source_reconstruction/bart_generic

@@ -60,6 +60,7 @@ These were computed on the test set (as far as I undersntand) of each dataset.
 |  QMSum | 53.5  | 26.3  | 32.9  |  Most recent SOTA: [here](https://www.semanticscholar.org/reader/6174938a95de0315fa1ce4b282f69574aa5e4019) |
 
 ## 2. Find currently used models
+
 - BART:
     - Comments: BART-Large has a max context-window of 1024.
     - Requires fine-tuning?: Probably.
@@ -121,4 +122,5 @@ Things to do:
 What's the main point of this experiment? Given a **non-generic** summarizer and a document for which we would like to do **non-generic** summarization, does using a literal listener based on some **non-generic latent** to rescore the summaries help?
 
 ## 4. Run fine-tuning experiments second
+
 - This is higher risk/difficulty

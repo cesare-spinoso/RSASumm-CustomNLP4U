@@ -1,0 +1,14 @@
+cache_merging_dir: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/merge_rescores/2024-04-08-13:55:18.540533
+metric: rouge
+lambda_interval: 0.1
+alpha_interval: 0.1
+evaluations:
+  - weighted_rsa
+summarizer_names:
+  - llama2_generic
+  - bart_e2e
+  - led_e2e
+  - llama2_e2e
+write_config_directory: /home/mila/c/cesare.spinoso/RSASumm/src/evaluation/config_instances/evaluate_cache_merged
+output_directory: /home/mila/c/cesare.spinoso/RSASumm/data/evaluation/evaluate_cache_merged
+commit: false

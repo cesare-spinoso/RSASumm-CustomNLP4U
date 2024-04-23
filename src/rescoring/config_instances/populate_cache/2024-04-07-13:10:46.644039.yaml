@@ -1,0 +1,7 @@
+reconstruction_yaml_paths:
+  source_reconstruction: /home/mila/c/cesare.spinoso/RSASumm/src/rescoring/rescored_summaries/source_reconstruction.yaml
+  latent_reconstruction: /home/mila/c/cesare.spinoso/RSASumm/src/rescoring/rescored_summaries/latent_reconstruction.yaml
+reconstruction_model_name: flan-t5-large-v1
+cache_directory: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/cache
+write_config_directory: /home/mila/c/cesare.spinoso/RSASumm/src/rescoring/config_instances/populate_cache
+finished_running: true

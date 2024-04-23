@@ -8,6 +8,7 @@ rescoring:
   type: latent_reconstruction
   preprocessed_dataset_path: /home/mila/c/cesare.spinoso/RSASumm/data/debatepedia/test.csv
   generated_summaries_yaml: /home/mila/c/cesare.spinoso/RSASumm/src/generate_summaries/generated_summaries/e2e_summaries.yaml
+  rescored_summaries_jsonl_path: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/latent_reconstruction/led_e2e/2024-04-01-17:02:24.089115.jsonl
   batch_size: 64
 output_directory: /network/scratch/c/cesare.spinoso/rsasumm/rescoring
 write_config_directory: /home/mila/c/cesare.spinoso/RSASumm/src/rescoring/config_instances/latent_reconstruction/led_e2e

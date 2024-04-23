@@ -23,9 +23,9 @@ from transformers import (
 )
 
 from src import HF_TOKEN, SCRATCH_CACHE_DIR, SRC_DIRECTORY
+from src.evaluation.compute_metrics import compute_rouge
 from src.utils.decorators import main_decorator
 from src.utils.helper import append_jsonlines, read_jsonlines
-from src.evaluation.compute_metrics import compute_rouge
 
 
 def get_data_e2e(cfg, run_name):
@@ -110,10 +110,10 @@ def get_data_generic(cfg, run_name):
                 run_name=run_name,
             )
             # Only keep documents that do not have generation
-            existing_document_ids = list(
-                set([elt["document_id"] for elt in generated_jsonlines])
+            existing_documents = list(
+                set([elt["source"] for elt in generated_jsonlines])
             )
-            dataset = dataset[~dataset[document_ids_name].isin(existing_document_ids)]
+            dataset = dataset[~dataset[source_name].isin(existing_documents)]
         document_ids = dataset[document_ids_name].tolist()
         source = dataset[source_name].tolist()
     else:
@@ -428,7 +428,7 @@ def write_batch(
 
 def generate_generic_summary(run_name, cfg):
     # Load source reference and document ids with duplication
-    document_ids, source = get_data_generic(cfg)
+    document_ids, source = get_data_generic(cfg, run_name)
     num_summaries = cfg["generation"]["generate_kwargs"]["num_return_sequences"]
     # Load model
     model_name = cfg["model"]["name"]

@@ -7,7 +7,7 @@ from src.utils.visualizations import (
 
 
 def main():
-    yaml_file_path = "/home/mila/c/cesare.spinoso/RSASumm/src/evaluation/evaluations/rouge_scores_table.yaml"
+    yaml_file_path = "/home/mila/c/cesare.spinoso/RSASumm/src/evaluation/evaluations/weighted_rsa.yaml"
     yaml_file_contents = read_yaml(yaml_file_path)
 
     fig_dict = {}

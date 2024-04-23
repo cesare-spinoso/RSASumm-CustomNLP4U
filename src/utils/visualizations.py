@@ -3,10 +3,12 @@ from ast import literal_eval as make_tuple
 
 import dash
 import pandas as pd
+import plotly
 import plotly.express as px
 import plotly.graph_objects as go
 from dash import dcc, html
 from dash.dependencies import Input, Output
+from IPython.display import HTML, display
 from jupyter_dash import JupyterDash
 from plotly.subplots import make_subplots
 from tabulate import tabulate
@@ -14,19 +16,33 @@ from tabulate import tabulate
 # Dataframes
 
 
-def convert_eval_json_to_df(json_path, evals_to_exclude=None):
+def convert_eval_json_to_df(
+    json_path,
+    multiple_metrics_format="string",
+    evals_to_exclude=None,
+):
     if evals_to_exclude is None:
         evals_to_exclude = []
     with open(json_path, "r") as f:
         data = json.load(f)
-    data = {
-        ds_name: {
-            eval_name: f"{eval_dict['rouge1']:.3f}/{eval_dict['rouge2']:.3f}/{eval_dict['rougeL']:.3f}"
-            for eval_name, eval_dict in eval_dict.items()
-            if eval_name not in evals_to_exclude
-        }
-        for ds_name, eval_dict in data.items()
-    }
+    for ds_name, eval_dict in data.items():
+        for eval_name, eval_dict in eval_dict.items():
+            if eval_name in evals_to_exclude:
+                continue
+            if multiple_metrics_format == "string":
+                data[ds_name][
+                    eval_name
+                ] = f"{eval_dict['rouge1']:.3f}/{eval_dict['rouge2']:.3f}/{eval_dict['rougeL']:.3f}"
+            elif multiple_metrics_format == "list":
+                data[ds_name][eval_name] = [
+                    eval_dict["rouge1"],
+                    eval_dict["rouge2"],
+                    eval_dict["rougeL"],
+                ]
+            else:
+                raise ValueError(
+                    "multiple_metrics_format must be either 'string' or 'list'"
+                )
     return pd.DataFrame(data)
 
 
@@ -74,13 +90,25 @@ def convert_weighted_rsa_json_to_dfs(json_path):
     return dfs
 
 
-def pretty_print(title, df):
+def pretty_print(df, title=None):
     if title is not None:
         print(title)
     print(tabulate(df, headers="keys", tablefmt="psql"))
 
 
 # PLotly
+
+
+def enable_latex():
+    # Balck magic makes latex render
+    # https://github.com/microsoft/vscode-jupyter/issues/8131
+    # NOTE: May need to run this twice in a notebook
+    plotly.offline.init_notebook_mode()
+    display(
+        HTML(
+            '<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_SVG"></script>'
+        )
+    )
 
 
 def compute_ranges(n):
@@ -94,6 +122,76 @@ def compute_ranges(n):
     return ranges
 
 
+def create_single_rsa_heatmap_figs(dfs, ds_name, metric_name):
+    enable_latex()
+    # Make subplot
+    df = dfs[ds_name][metric_name]
+    # Make the lmabda = 1 row all the same
+    df.loc[1.0, :] = df.loc[1.0, 0.0]
+    # Reverse the dataframe (for plotting)
+    df = df.iloc[::-1]
+    df.loc
+    fig = go.Figure(
+        data=go.Heatmap(
+            x=df.columns,
+            y=df.index,
+            z=df.values,
+        )
+    )
+    fig.update_layout(xaxis_title=r"$\alpha$", yaxis_title=r"$\lambda$")
+    fig.update_layout(font=dict(size=18))
+    return fig
+
+
+def create_single_rsa_line_plot(dfs, sota_number, oracle_number, ds_name, metric_name):
+    enable_latex()
+    df = dfs[ds_name][metric_name]
+    # Make the lmabda = 1 row all the same
+    df.loc[1.0, :] = df.loc[1.0, 0.0]
+    fig = go.Figure()
+    # Add horizontal lines
+    if sota_number is not None:
+        fig.add_hline(y=sota_number, line_dash="dash", line_color="green", name="SOTA")
+    if oracle_number is not None:
+        fig.add_hline(
+            y=oracle_number, line_dash="dash", line_color="blue", name="Oracle"
+        )
+    # Add (direct)^lambda * (source)^{1-lambda}
+    fig.add_trace(
+        go.Scatter(
+            x=df.index,
+            y=df.loc[:, 1.0],
+            mode="lines+markers",
+            name="Source Rec.",
+            # name="$R_0 = P_{R_0}(x|\hat{y}_i)$",
+        )
+    )
+    # Add (direct)^lambda * (latent)^{1-lambda}
+    fig.add_trace(
+        go.Scatter(
+            x=df.index,
+            y=df.loc[:, 0.0],
+            mode="lines+markers",
+            name="Latent Rec.",
+            # name="$R_0 = P_{R_0}(z|\hat{y}_i)$",
+        )
+    )
+    fig.update_layout(
+        xaxis_title="$\lambda$",
+        yaxis_title="ROUGE-1",
+        xaxis_range=[-0.01, 1.01],
+    )
+    fig.update_layout(
+        legend=dict(
+            x=0.1,
+            y=(df.loc[:, 1.0].max() + df.loc[:, 0.0].max()) / 2,
+            font=dict(size=18),
+        )
+    )
+    fig.update_layout(font=dict(size=18))
+    return fig
+
+
 def create_weighted_rsa_heatmap_figs(dfs):
     # Make subplot
     nrows = len(dfs)
@@ -105,7 +203,7 @@ def create_weighted_rsa_heatmap_figs(dfs):
         horizontal_spacing=0.05,
         vertical_spacing=0.05,
         column_titles=[metric for metric in example_dict.keys()],
-        row_titles=list(reversed([ds_name for ds_name in dfs.keys()])),
+        row_titles=[ds_name for ds_name in dfs.keys()],
         row_heights=[1 for _ in range(nrows)],
         column_widths=[1 for _ in range(ncols)],
         x_title="alpha",

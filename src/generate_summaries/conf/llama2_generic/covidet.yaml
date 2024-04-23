@@ -12,6 +12,8 @@ model:
 generation:
   batch_size: 4
   summary_type: generic
+  generated_jsonl_paths:
+    - /home/mila/c/cesare.spinoso/RSASumm/data/generate_summaries/llama2_generic/2024-03-16-10:41:19.932298.jsonl
   seed: 42
   generate_kwargs:
     num_beams: 5

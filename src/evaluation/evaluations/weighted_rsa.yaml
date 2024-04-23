@@ -1,0 +1,6 @@
+bart_generic: /home/mila/c/cesare.spinoso/RSASumm/data/evaluation/evaluate_cache_merged/2024-04-08-19:08:32.235385/bart_generic.json
+led_generic: /home/mila/c/cesare.spinoso/RSASumm/data/evaluation/evaluate_cache_merged/2024-04-08-19:08:32.235385/led_generic.json
+llama2_generic: /home/mila/c/cesare.spinoso/RSASumm/data/evaluation/evaluate_cache_merged/2024-04-12-14:54:14.203244/llama2_generic.json
+bart_e2e: /home/mila/c/cesare.spinoso/RSASumm/data/evaluation/evaluate_cache_merged/2024-04-12-14:54:14.203244/bart_e2e.json
+led_e2e: /home/mila/c/cesare.spinoso/RSASumm/data/evaluation/evaluate_cache_merged/2024-04-12-14:54:14.203244/led_e2e.json
+llama2_e2e: /home/mila/c/cesare.spinoso/RSASumm/data/evaluation/evaluate_cache_merged/2024-04-12-14:54:14.203244/llama2_e2e.json

@@ -70,7 +70,7 @@ def load_model(cfg):
     return model, tokenizer
 
 
-def get_summary_jsonl(cfg):
+def get_summary_jsonl(cfg, run_name):
     summary_jsonl_data = []
     with open(cfg["rescoring"]["generated_summaries_yaml"], "r") as yaml_file:
         try:
@@ -85,45 +85,79 @@ def get_summary_jsonl(cfg):
     else:
         for jsonl_path in summary_jsonl_path:
             summary_jsonl_data += read_jsonlines(jsonl_path)
-    return summary_jsonl_data
+    if "rescored_summaries_jsonl_path" in cfg["rescoring"]:
+        rescored_summaries = read_jsonlines(
+            cfg["rescoring"]["rescored_summaries_jsonl_path"]
+        )
+        output_directory = os.path.join(
+            cfg["output_directory"], cfg["rescoring"]["type"], cfg["summarizer_name"]
+        )
+        append_jsonlines(rescored_summaries, output_directory, run_name)
+        if cfg["rescoring"]["type"] == "source_reconstruction":
+            generated_source_pred = [
+                (elt["pred"], elt["source"]) for elt in rescored_summaries
+            ]
+            summary_jsonl_data = [
+                elt
+                for elt in summary_jsonl_data
+                if (elt["pred"], elt["source"]) not in generated_source_pred
+            ]
+            return summary_jsonl_data, None
+        elif cfg["rescoring"]["type"] == "latent_reconstruction":
+            return summary_jsonl_data, rescored_summaries
+        else:
+            raise ValueError("Rescoring type not recognized")
+    else:
+        return summary_jsonl_data, None
 
 
-def generic_latent_rec_values(summary_jsonl_data, cfg):
-    # Read from jsonl and csv and check that values are consistent
-    document_ids = [obj["document_id"] for obj in summary_jsonl_data]
-    source = [obj["source"] for obj in summary_jsonl_data]
-    pred = [obj["pred"] for obj in summary_jsonl_data]
-    assert len(document_ids) == len(source) == len(pred) == len(summary_jsonl_data)
-    assert cfg["dataset_name"] in cfg["rescoring"]["preprocessed_dataset_path"]
+def process_llama2_preds(rec_input):
+    for i, elt in enumerate(rec_input):
+        if "[/INST]" in elt:
+            rec_input[i] = elt.split("[/INST]")[1].strip()
+        elif "summary:" in elt:
+            rec_input[i] = elt.split("summary:")[1].strip()
+        else:
+            rec_input[i] = elt
+    return rec_input
+
+
+def generic_latent_rec_values(summary_jsonl_data, rescored_summaries, cfg):
+    # Get raw data for latent mapping
     df = pd.read_csv(cfg["rescoring"]["preprocessed_dataset_path"])
-    set_doc_ids = set(document_ids)
-    set_source = set(source)
-    if len(set_doc_ids) != len(set_source):
-        warnings.warn(f"{len(set_doc_ids)=} and {len(set_source)=}")
-    assert set_doc_ids <= set(df["document_id"].values.tolist()) and set_source <= set(
-        df["document"].values.tolist()
-    )
-    # Create the combination of docs, latents and preds
     latent_column_name = get_latent_column_name(cfg["dataset_name"])
-    latent_dict = df.groupby("document_id")[latent_column_name].apply(list).to_dict()
-    output = []
-    for doc_id, s, p in zip(document_ids, source, pred):
+    latent_dict = df.groupby("document")[latent_column_name].apply(list).to_dict()
+    # Generate new data
+    existing_pred_latent = []
+    if rescored_summaries is not None:
+        existing_pred_latent = [
+            (elt["pred"], elt[latent_column_name]) for elt in rescored_summaries
+        ]
+    document_ids = []
+    source = []
+    pred = []
+    latents = []
+    for elt in summary_jsonl_data:
         # NOTE: The latent might have duplicates, this is an evaluation-time decision
-        for latent in set(latent_dict[doc_id]):
-            output.append((doc_id, s, p, latent))
-    assert all(len(o) == len(output[0]) for o in output)
-    return ([o[i] for o in output] for i in range(len(output[0])))
+        if elt["source"] not in latent_dict:
+            continue
+        for latent in set(latent_dict[elt["source"]]):
+            if (elt["pred"], latent) in existing_pred_latent:
+                continue
+            document_ids.append(elt["document_id"])
+            source.append(elt["source"])
+            pred.append(elt["pred"])
+            latents.append(latent)
+    if "llama" in cfg["summarizer_name"]:
+        pred = process_llama2_preds(pred)
+    return document_ids, source, pred, latents
 
 
-def e2e_latent_rec_values(summary_jsonl_data, cfg):
+def e2e_latent_rec_values(summary_jsonl_data, rescored_summaries, cfg):
     # This assumes there is a one-to-one correspondence between
     # the question given to the e2e model and the latent for each dataset
     latent_column_name = get_latent_column_name(cfg["dataset_name"])
-    document_ids = [obj["document_id"] for obj in summary_jsonl_data]
-    source = [obj["source"] for obj in summary_jsonl_data]
-    pred = [obj["pred"] for obj in summary_jsonl_data]
-    question = [obj["question"] for obj in summary_jsonl_data]
-    # Merge with the raw dataframe to get the latent
+    # Use the raw dataframe to get the latent
     df_raw = pd.read_csv(cfg["rescoring"]["preprocessed_dataset_path"])
     if "covidet" == cfg["dataset_name"]:
         df_raw["question"] = df_raw["emotion"].apply(
@@ -131,22 +165,39 @@ def e2e_latent_rec_values(summary_jsonl_data, cfg):
         )
     if "debatepedia" == cfg["dataset_name"]:
         df_raw["question"] = df_raw["query"]
-    question_to_latent = dict(
-        zip(
-            df_raw["question"].tolist(),
-            df_raw[latent_column_name],
-        )
+    question_to_latent = (
+        df_raw.groupby("question")[latent_column_name].apply(list).to_dict()
     )
-    latent = [question_to_latent[q] for q in question]
-    assert len(document_ids) == len(source) == len(pred) == len(latent)
-    return document_ids, source, pred, latent
+    # Generate new data
+    existing_pred_latent = []
+    if rescored_summaries is not None:
+        existing_pred_latent = [
+            (elt["pred"], elt[latent_column_name]) for elt in rescored_summaries
+        ]
+    document_ids = []
+    source = []
+    pred = []
+    latents = []
+    for elt in summary_jsonl_data:
+        if elt["question"] not in question_to_latent:
+            continue
+        for latent in set(question_to_latent[elt["question"]]):
+            if (elt["pred"], latent) in existing_pred_latent:
+                continue
+            document_ids.append(elt["document_id"])
+            source.append(elt["source"])
+            pred.append(elt["pred"])
+            latents.append(latent)
+    if "llama" in cfg["summarizer_name"]:
+        pred = process_llama2_preds(pred)
+    return document_ids, source, pred, latents
 
 
-def get_latent_rec_values(summary_jsonl_data, cfg):
+def get_latent_rec_values(summary_jsonl_data, rescored_summaries, cfg):
     if "generic" in cfg["summarizer_name"]:
-        return generic_latent_rec_values(summary_jsonl_data, cfg)
+        return generic_latent_rec_values(summary_jsonl_data, rescored_summaries, cfg)
     elif "e2e" in cfg["summarizer_name"]:
-        return e2e_latent_rec_values(summary_jsonl_data, cfg)
+        return e2e_latent_rec_values(summary_jsonl_data, rescored_summaries, cfg)
     else:
         raise ValueError("Summarizer name not recognized")
 
@@ -155,31 +206,13 @@ def get_source_rec_values(summary_jsonl_data, cfg):
     # input is what you will condition the reconstruction on
     # target is the target reconstruction which for the source
     # reconstruction is the source document
+    # The target is what you'd like to reconstruct
+    # The source is the LM's conditional
+    doc_ids = [obj["document_id"] for obj in summary_jsonl_data]
     rec_input = [obj["pred"] for obj in summary_jsonl_data]
-    if cfg["summarizer_name"] != "oracle":
-        # The target is what you'd like to reconstruct
-        # The source is the LM's conditional
-        doc_ids = [obj["document_id"] for obj in summary_jsonl_data]
-        rec_target = [obj["source"] for obj in summary_jsonl_data]
-        assert (
-            len(rec_target) == len(rec_input) == len(doc_ids) == len(summary_jsonl_data)
-        )
-        # Sanity check the doc ids
-        assert cfg["dataset_name"] in cfg["rescoring"]["preprocessed_dataset_path"]
-        df = pd.read_csv(cfg["rescoring"]["preprocessed_dataset_path"])
-        document_ids = set(df["document_id"].values.tolist())
-        documents = set(df["document"].values.tolist())
-        set_doc_ids = set(doc_ids)
-        set_rec_target = set(rec_target)
-        if len(set_doc_ids) != len(set_rec_target):
-            warnings.warn(f"{len(set_doc_ids)=} and {len(set_rec_target)=}")
-        assert set_doc_ids <= document_ids and set_rec_target <= documents, print(
-            set_doc_ids, set_rec_target, document_ids, documents
-        )
-    elif cfg["summarizer_name"] == "oracle":
-        raise NotImplementedError("Oracle implementation not done yet")
-    else:
-        raise ValueError("Summarizer name not recognized")
+    rec_target = [obj["source"] for obj in summary_jsonl_data]
+    if "llama" in cfg["summarizer_name"]:
+        rec_input = process_llama2_preds(rec_input)
     return doc_ids, rec_input, rec_target
 
 
@@ -258,7 +291,7 @@ def compute_source_reconstruction(run_name, cfg):
     # Load model and tokenizer and set to inference mode
     model, tokenizer = load_model(cfg)
     # Load data
-    summary_jsonl_data = get_summary_jsonl(cfg)
+    summary_jsonl_data, _ = get_summary_jsonl(cfg, run_name)
     # Get reconstruction input and output
     doc_ids, rec_input, rec_target = get_source_rec_values(summary_jsonl_data, cfg)
     # Compute reconstruction
@@ -317,10 +350,10 @@ def compute_latent_reconstruction(run_name, cfg):
     # Load model and tokenizer and set to inference mode
     model, tokenizer = load_model(cfg)
     # Load data
-    summary_jsonl_data = get_summary_jsonl(cfg)
+    summary_jsonl_data, rescored_summaries = get_summary_jsonl(cfg, run_name)
     # Get reconstruction input and output
     (doc_ids, sources, predictions, latents) = get_latent_rec_values(
-        summary_jsonl_data, cfg
+        summary_jsonl_data, rescored_summaries, cfg
     )
     # Run in batches
     batch_size = cfg["rescoring"]["batch_size"]
@@ -368,7 +401,7 @@ def compute_latent_reconstruction(run_name, cfg):
 @hydra.main(
     version_base=None,
     config_path=os.path.join(
-        SRC_DIRECTORY, "rescoring", "conf"
+        SRC_DIRECTORY, "rescoring", "conf",
     )
 )
 @main_decorator
