@@ -1,0 +1,14 @@
+dataset_name: covidet
+summarizer_name: bart_large_base_e2e_finetuned
+tokenizer:
+  name: google/flan-t5-large
+model:
+  name: google/flan-t5-large
+rescoring:
+  type: source_reconstruction
+  preprocessed_dataset_path: /home/mila/c/cesare.spinoso/RSASumm/data/covidet/test.csv
+  generated_summaries_yaml: /home/mila/c/cesare.spinoso/RSASumm/src/generate_summaries/generated_summaries/e2e_finetuned_summaries.yaml
+  batch_size: 64
+output_directory: /network/scratch/c/cesare.spinoso/rsasumm/rescoring
+write_config_directory: /home/mila/c/cesare.spinoso/RSASumm/src/rescoring/config_instances/source_reconstruction/bart_large_base_e2e_finetuned
+finished_running: true

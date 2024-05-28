@@ -4,3 +4,4 @@ llama2_generic: /home/mila/c/cesare.spinoso/RSASumm/data/evaluation/evaluate_cac
 bart_e2e: /home/mila/c/cesare.spinoso/RSASumm/data/evaluation/evaluate_cache_merged/2024-04-12-14:54:14.203244/bart_e2e.json
 led_e2e: /home/mila/c/cesare.spinoso/RSASumm/data/evaluation/evaluate_cache_merged/2024-04-12-14:54:14.203244/led_e2e.json
 llama2_e2e: /home/mila/c/cesare.spinoso/RSASumm/data/evaluation/evaluate_cache_merged/2024-04-12-14:54:14.203244/llama2_e2e.json
+bart_e2e_finetuned: /home/mila/c/cesare.spinoso/RSASumm/data/evaluation/evaluate_cache_merged/2024-04-25-15:24:50.228383/bart_e2e_finetuned.json

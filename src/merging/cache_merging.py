@@ -197,6 +197,7 @@ def write_merged_datasets(datasets_dict, output_dir_path, run_name, convert_new_
 @hydra.main(
     version_base=None,
     config_path=os.path.join(SRC_DIRECTORY, "merging", "conf", "cache_merging"),
+    config_name="config",
 )
 @main_decorator
 def main(run_name, cfg):

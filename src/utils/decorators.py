@@ -6,6 +6,12 @@ from omegaconf import DictConfig, OmegaConf
 from src import SRC_DIRECTORY
 from src.utils.git import commit
 
+def test_decorator(func):
+    def wrapper(cfg: DictConfig):
+        cfg = OmegaConf.to_container(cfg, resolve=True)
+        print(datetime.now().strftime("%Y-%m-%d-%H:%M:%S.%f"))
+        func(cfg)
+    return wrapper
 
 def main_decorator(func):
     def wrapper(cfg: DictConfig):
@@ -15,6 +21,8 @@ def main_decorator(func):
         # Pre-run commit
         run_name = datetime.now().strftime("%Y-%m-%d-%H:%M:%S.%f")
         print(f"Running with config run name : {run_name} with config : {cfg}")
+        if not os.path.exists(cfg["write_config_directory"]):
+            os.makedirs(cfg["write_config_directory"])
         with open(
             os.path.join(cfg["write_config_directory"], f"{run_name}.yaml"), "w"
         ) as f:

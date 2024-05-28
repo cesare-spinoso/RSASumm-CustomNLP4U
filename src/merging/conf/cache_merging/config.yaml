@@ -1,16 +1,17 @@
 datasets:
   covidet: /home/mila/c/cesare.spinoso/RSASumm/data/covidet/test.csv
   debatepedia: /home/mila/c/cesare.spinoso/RSASumm/data/debatepedia/test.csv
-  duc_single: /home/mila/c/cesare.spinoso/RSASumm/data/duc/duc_single/preprocessed.csv
+  # duc_single: /home/mila/c/cesare.spinoso/RSASumm/data/duc/duc_single/preprocessed.csv
   multioped: /home/mila/c/cesare.spinoso/RSASumm/data/multioped/test.csv
   qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/qmsum/test.csv
 summarizer_names:
-  - bart_generic
-  - led_generic
-  - llama2_generic
-  - bart_e2e
-  - led_e2e
-  - llama2_e2e
+  - bart_e2e_finetuned
+  # - bart_generic
+  # - led_generic
+  # - llama2_generic
+  # - bart_e2e
+  # - led_e2e
+  # - llama2_e2e
 cached_summaries_dir_path: /home/mila/c/cesare.spinoso/RSASumm/data/generate_summaries/cache
 cached_rescores_path: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/cache/flan-t5-large.pkl
 print_sanity_check: true

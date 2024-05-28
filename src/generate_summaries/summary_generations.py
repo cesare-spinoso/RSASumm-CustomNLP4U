@@ -24,6 +24,7 @@ from transformers import (
 
 from src import HF_TOKEN, SCRATCH_CACHE_DIR, SRC_DIRECTORY
 from src.evaluation.compute_metrics import compute_rouge
+from src.finetuning.literal_summarizer.models import LiteralSummarizerPLModule
 from src.utils.decorators import main_decorator
 from src.utils.helper import append_jsonlines, read_jsonlines
 
@@ -124,6 +125,10 @@ def get_data_generic(cfg, run_name):
 def load_model(cfg):
     model_name = cfg["model"]["name"]
     tokenizer_name = cfg["tokenizer"]["name"]
+    path_to_checkpoint = None
+    if "path_to_checkpoint" in cfg["model"]:
+        assert "bart" in model_name
+        path_to_checkpoint = cfg["model"]["path_to_checkpoint"]
     if tokenizer_name == model_name and model_name.startswith("t5"):
         # See https://github.com/huggingface/transformers/pull/24565 for why legacy=False
         tokenizer = T5Tokenizer.from_pretrained(
@@ -139,13 +144,22 @@ def load_model(cfg):
         model = T5ForConditionalGeneration.from_pretrained(
             model_name, cache_dir=SCRATCH_CACHE_DIR
         ).to("cuda")
-    elif tokenizer_name == model_name == "facebook/bart-large-cnn":
+    elif "bart" in tokenizer_name and "bart" in model_name:
         tokenizer = AutoTokenizer.from_pretrained(
             tokenizer_name, cache_dir=SCRATCH_CACHE_DIR
         )
-        model = BartForConditionalGeneration.from_pretrained(
-            model_name, cache_dir=SCRATCH_CACHE_DIR
-        ).to("cuda")
+        if path_to_checkpoint is None:
+            model = BartForConditionalGeneration.from_pretrained(
+                model_name, cache_dir=SCRATCH_CACHE_DIR
+            ).to("cuda")
+        else:
+            # NOTE: This might require passing dummy parameters
+            pl_module = LiteralSummarizerPLModule.load_from_checkpoint(
+                path_to_checkpoint
+            )
+            model = pl_module.model
+            model.to("cuda")
+            model.eval()
     elif tokenizer_name == model_name == "google/pegasus-large":
         tokenizer = PegasusTokenizer.from_pretrained(
             tokenizer_name, cache_dir=SCRATCH_CACHE_DIR

@@ -1,0 +1,10 @@
+bart_large_cnn_e2e_finetuned:
+  covidet: /home/mila/c/cesare.spinoso/RSASumm/data/generate_summaries/bart_finetuned/2024-04-25-12:35:48.027851.jsonl
+  debatepedia: /home/mila/c/cesare.spinoso/RSASumm/data/generate_summaries/bart_finetuned/2024-04-25-12:42:29.745086.jsonl
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/generate_summaries/bart_finetuned/2024-04-25-12:47:00.205279.jsonl
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/generate_summaries/bart_finetuned/2024-04-25-12:57:18.098775.jsonl
+bart_large_base_e2e_finetuned:
+  covidet: /home/mila/c/cesare.spinoso/RSASumm/data/generate_summaries/bart_finetuned/2024-05-02-11:06:04.326971.jsonl
+  debatepedia: /home/mila/c/cesare.spinoso/RSASumm/data/generate_summaries/bart_finetuned/2024-05-02-11:10:25.469753.jsonl
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/generate_summaries/bart_finetuned/2024-05-02-11:12:11.974104.jsonl
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/generate_summaries/bart_finetuned/2024-05-02-11:22:28.259912.jsonl

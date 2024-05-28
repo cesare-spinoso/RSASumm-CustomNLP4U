@@ -46,3 +46,13 @@ llama2_e2e:
   duc_single: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/llama2_e2e/2024-04-08-00:16:44.551794.jsonl
   multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/llama2_e2e/2024-04-08-00:07:57.195668.jsonl
   qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/llama2_e2e/2024-04-08-00:13:53.736009.jsonl
+bart_large_cnn_e2e_finetuned:
+  covidet: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/bart_e2e_finetuned/2024-04-25-14:29:29.278555.jsonl
+  debatepedia: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/bart_e2e_finetuned/2024-04-25-14:37:43.752851.jsonl
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/bart_e2e_finetuned/2024-04-25-14:41:04.323482.jsonl
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/bart_e2e_finetuned/2024-04-25-14:47:33.750688.jsonl
+bart_large_base_e2e_finetuned:
+  covidet: 
+  debatepedia: 
+  multioped: 
+  qmsum: 

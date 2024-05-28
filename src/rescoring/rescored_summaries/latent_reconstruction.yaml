@@ -46,3 +46,13 @@ llama2_e2e:
   duc_single: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/latent_reconstruction/llama2_e2e/2024-04-08-00:01:30.526808.jsonl
   multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/latent_reconstruction/llama2_e2e/2024-04-07-23:59:40.740936.jsonl
   qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/latent_reconstruction/llama2_e2e/2024-04-08-00:01:00.968637.jsonl
+bart_large_cnn_e2e_finetuned:
+  covidet: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/latent_reconstruction/bart_e2e_finetuned/2024-04-25-14:26:35.353801.jsonl
+  debatepedia: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/latent_reconstruction/bart_e2e_finetuned/2024-04-25-14:27:10.556498.jsonl
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/latent_reconstruction/bart_e2e_finetuned/2024-04-25-14:27:40.417186.jsonl
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/latent_reconstruction/bart_e2e_finetuned/2024-04-25-14:28:33.374896.jsonl
+bart_large_base_e2e_finetuned:
+  covidet: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/latent_reconstruction/bart_large_base_e2e_finetuned/2024-05-02-19:07:53.759501.jsonl
+  debatepedia: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/latent_reconstruction/bart_large_base_e2e_finetuned/2024-05-02-19:08:21.103759.jsonl
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/latent_reconstruction/bart_large_base_e2e_finetuned/2024-05-02-19:08:41.343375.jsonl
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/latent_reconstruction/bart_large_base_e2e_finetuned/2024-05-02-19:09:32.271750.jsonl

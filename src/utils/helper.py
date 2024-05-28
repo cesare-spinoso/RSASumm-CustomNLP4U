@@ -19,6 +19,8 @@ def read_jsonlines(file_path):
 
 
 def append_jsonlines(dict_to_write, output_directory, run_name):
+    if not os.path.exists(output_directory):
+        os.makedirs(output_directory)
     with jsonlines.open(
         os.path.join(output_directory, f"{run_name}.jsonl"), "a"
     ) as writer:

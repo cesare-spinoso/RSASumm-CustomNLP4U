@@ -21,11 +21,20 @@ def get_cache_content_from_jsonlines(
     return cache_content
 
 
-def get_cache_content_from_yaml(yaml_content, rec_type):
+def get_cache_content_from_yaml(
+    yaml_content, rec_type, summarizer_names=None, dataset_names=None
+):
     cache_content = {}
     cache_output_keys = ["reconstruction_score", "avg_reconstruction_score"]
-    for jsonl_path_dict in tqdm(yaml_content.values()):
+    for summarizer_name, jsonl_path_dict in tqdm(yaml_content.items()):
+        if (
+            isinstance(summarizer_names, list)
+            and summarizer_name not in summarizer_names
+        ):
+            continue
         for dataset_name, jsonlines_path in tqdm(jsonl_path_dict.items()):
+            if isinstance(dataset_name, list) and dataset_name not in dataset_names:
+                continue
             latent_column_name = get_latent_column_name(dataset_name)
             if rec_type == "source_reconstruction":
                 cache_input_keys = ["pred", "source"]
@@ -63,6 +72,8 @@ def main(_, config):
     # Cache rescorings from jsonlines found in yamls
     print("Fetching rescorings from jsonlines")
     yaml_paths = config["reconstruction_yaml_paths"]
+    summarizer_names = config.get("summarizer_names", None)
+    dataset_names = config.get("dataset_names", None)
     for rec_type, yaml_path in yaml_paths.items():
         yaml_content = read_yaml(yaml_path)
         cache_dict = {
@@ -70,6 +81,8 @@ def main(_, config):
             **get_cache_content_from_yaml(
                 yaml_content,
                 rec_type,
+                summarizer_names=summarizer_names,
+                dataset_names=dataset_names,
             ),
         }
     # Write to the cache

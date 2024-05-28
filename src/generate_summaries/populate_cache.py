@@ -1,5 +1,6 @@
 import os
 import pickle as pkl
+import warnings
 
 import hydra
 
@@ -33,6 +34,10 @@ def cache_summaries_from_yaml(yaml_content, cache_dir):
         for jsonlines_path in jsonl_path_dict.values():
             jsonlines_data = read_jsonlines(jsonlines_path)
             cache_path = os.path.join(cache_dir, f"{model_name}.pkl")
+            warnings.warn(
+                f"Note that the cache file is saved at {cache_path} which may be undesirable if you are dealing"
+                + " with an updated model e.g. after more hyperparameter tuning."
+            )
             cache_jsonlines(
                 cache_input_keys, cache_output_keys, jsonlines_data, cache_path
             )

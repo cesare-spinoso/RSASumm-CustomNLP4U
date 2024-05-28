@@ -14,6 +14,8 @@ DATASET_NAMES = {"covidet", "debatepedia", "duc_single", "multioped", "qmsum"}
 
 METRICS_CACHE_DIR = os.path.join(SRC_DIRECTORY, "..", "data", "evaluation", "metrics_cache")
 
+WANDB_DIRECTORY = os.path.join(SRC_DIRECTORY, "..", "data", "wandb")
+
 # Mila cluster specific constants
 SCRATCH_DIR = SRC_DIRECTORY.parent.parent / "scratch"
 
