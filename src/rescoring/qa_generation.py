@@ -41,26 +41,18 @@ def load_model(cfg):
     return tokenizer, model
 
 
-def tokenize_source(model_name, tokenizer, question, source, cfg):
+def tokenize_qa(model_name, tokenizer, question, source, cfg):
     assert "llama" in model_name.lower()
     assert len(question) == len(source)
     # Change padding, but only for now
     tokenizer.padding_side = "right"
-    # Truncate the source to allow for the prompt formatting of s
-    q_example = cfg["qa"]["incontext-question"]
-    c_example = cfg["qa"]["incontext-content"]
-    a_example = cfg["qa"]["incontext-answer"]
     prompt = (
         lambda q, c: f"""
     <s>[INST] <<SYS>>
-    You are a helpful, respectful and honest assistant specializing in question answering. Provide answers to questions given a context. For example,
-    Question: {q_example}
-    Context: {c_example}
-    Answer: {a_example}
+    You are a helpful, respectful and honest assistant specializing in question answering. Read 
     <</SYS>>
-
+    Document: {c}
     Question: {q}
-    Context: {c}
     Answer: [/INST]
     """
     )
@@ -119,7 +111,7 @@ def main(run_name, cfg):
     assert (~df["document"].isna()).sum() > 0 and (~df["question"].isna()).sum() > 0
     df_new = df[["document_id", "document", "question"]].drop_duplicates()
     # Tokenize for QAing
-    tokenized_input_ids, attention_mask = tokenize_source(
+    tokenized_input_ids, attention_mask = tokenize_qa(
         model_name=model_name,
         tokenizer=tokenizer,
         question=df_new["question"].values.tolist(),
