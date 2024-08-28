@@ -4,12 +4,14 @@ import datasets
 import hydra
 import numpy as np
 import pandas as pd
+import regex
 import stanza
 import torch
 from omegaconf import DictConfig
 from tqdm import tqdm
 from transformers import (
     AutoTokenizer,
+    AutoModelForCausalLM,
     BartForConditionalGeneration,
     LEDForConditionalGeneration,
     LEDTokenizer,
@@ -21,20 +23,59 @@ from transformers import (
     T5Tokenizer,
     set_seed,
 )
+from accelerate import load_checkpoint_and_dispatch
 
 from src import HF_TOKEN, SCRATCH_CACHE_DIR, SRC_DIRECTORY
 from src.evaluation.compute_metrics import compute_rouge
 from src.finetuning.literal_summarizer.models import LiteralSummarizerPLModule
+from src.rescoring.rescore_summaries import process_llama3_preds
 from src.utils.decorators import main_decorator
-from src.utils.helper import append_jsonlines, read_jsonlines
+from src.utils.helper import append_jsonlines, read_jsonlines, read_yaml
 
 
 def get_data_e2e(cfg, run_name):
     ds_name = cfg["dataset"]["name"]
     source_name = cfg["dataset"]["source_name"]
     question_name = cfg["dataset"]["question_name"]
-    ds_path = cfg["dataset"]["path"]
-    dataset = pd.read_csv(ds_path)
+    if "path" in cfg["dataset"]:
+        ds_path = cfg["dataset"]["path"]
+        dataset = pd.read_csv(ds_path)
+    elif "generated_questions_yaml" in cfg["dataset"]:
+        yaml_data = read_yaml(cfg["dataset"]["generated_questions_yaml"])
+        generated_questions_jsonl = yaml_data[cfg["dataset"]["qs_generator"]][cfg["dataset"]["name"]]
+        generated_questions = read_jsonlines(generated_questions_jsonl)
+        dataset = pd.DataFrame(generated_questions)
+        dataset.rename(
+            columns={"document": source_name, "generated_answer": question_name},
+            inplace=True,
+        )
+        rows_to_keep = []
+        for doc_ic, doc, question in zip(
+            dataset["document_id"], dataset[source_name], dataset[question_name]
+        ):
+            if "Questions: |eot_id|>assistantassistant" in question:
+                question = question.split("Questions: |eot_id|>assistantassistant")[
+                    -1
+                ].strip()
+            elif "Questions: |eot_id|>assistant" in question:
+                question = question.split("Questions: |eot_id|>assistant")[-1].strip()
+            else:
+                continue
+            qs = regex.findall(
+                r"what[^\?]*\?|who[^\?]*\?|where[^\?]*\?|when[^\?]*\?|how[^\?]*\?|why[^\?]*\?",
+                question,
+                flags=regex.IGNORECASE,
+            )
+            if len(qs) == 0:
+                continue
+            else:
+                question = " ".join(qs)
+            rows_to_keep.append([doc_ic, doc, question])
+        dataset = pd.DataFrame(
+            rows_to_keep, columns=["document_id", source_name, question_name]
+        )
+    else:
+        raise ValueError("Invalid dataset configuration")
     if ds_name == "covidet":
         # Create the question
         assert question_name == "question"
@@ -47,8 +88,14 @@ def get_data_e2e(cfg, run_name):
     )
     dataset = dataset[~duplicated_documents]
     if "generated_jsonl_paths" in cfg["generation"]:
+        generated_jsonl_paths = cfg["generation"]["generated_jsonl_paths"]
+        generated_jsonl_paths = (
+            [generated_jsonl_paths]
+            if isinstance(generated_jsonl_paths, str)
+            else generated_jsonl_paths
+        )
         generated_jsonlines = []
-        for jsonlines_path in cfg["generation"]["generated_jsonl_paths"]:
+        for jsonlines_path in generated_jsonl_paths:
             generated_jsonlines += read_jsonlines(jsonlines_path)
         # Write existing to the jsonl file
         write_to_jsonlines = []
@@ -150,7 +197,7 @@ def load_model(cfg):
         )
         if path_to_checkpoint is None:
             model = BartForConditionalGeneration.from_pretrained(
-                model_name, cache_dir=SCRATCH_CACHE_DIR
+                model_name, cache_dir=SCRATCH_CACHE_DIR, device_map="auto"
             ).to("cuda")
         else:
             # NOTE: This might require passing dummy parameters
@@ -158,7 +205,10 @@ def load_model(cfg):
                 path_to_checkpoint
             )
             model = pl_module.model
-            model.to("cuda")
+            # This is a workaround in case you are using multiple gpus
+            model = load_checkpoint_and_dispatch(
+                model=model, checkpoint=path_to_checkpoint, device_map="auto"
+            )
             model.eval()
     elif tokenizer_name == model_name == "google/pegasus-large":
         tokenizer = PegasusTokenizer.from_pretrained(
@@ -182,7 +232,7 @@ def load_model(cfg):
             .to("cuda")
             .half()
         )
-    elif tokenizer_name == model_name and "llama" in model_name:
+    elif tokenizer_name == model_name and "Llama-2" in model_name:
         # FOllowing https://colab.research.google.com/github/bigscience-workshop/petals/blob/main/examples/prompt-tuning-sst2.ipynb#scrollTo=03c6e53e
         tokenizer = LlamaTokenizer.from_pretrained(
             tokenizer_name,
@@ -203,6 +253,22 @@ def load_model(cfg):
             cache_dir=SCRATCH_CACHE_DIR,
         )
         model.bfloat16()
+    elif tokenizer_name == model_name and "Llama-3" in model_name:
+        tokenizer = AutoTokenizer.from_pretrained(
+            tokenizer_name,
+            padding_size="left",
+            token=HF_TOKEN,
+            cache_dir=SCRATCH_CACHE_DIR,
+        )
+        tokenizer.pad_token = tokenizer.eos_token
+        tokenizer.model_max_length = cfg["tokenizer"]["maximum_length"]
+        model = AutoModelForCausalLM.from_pretrained(
+            model_name,
+            load_in_8bit=True,
+            device_map="auto",
+            token=HF_TOKEN,
+            cache_dir=SCRATCH_CACHE_DIR,
+        )
     else:
         raise ValueError(f"Invalid tokenizer {tokenizer_name} and model {model_name}")
     model.eval()
@@ -344,8 +410,29 @@ def tokenizer_source_and_question(model_name, tokenizer, question, source, cfg):
     return source_input_ids, attention_mask
 
 
+def compute_log_likelihoods(output_ids, logits):
+    # logits is a tuple of length = max_new_tokens
+    output_ids = output_ids[:, -len(logits) :]  # bz x seq_len
+    assert (
+        output_ids.shape[1] == len(logits) and output_ids.shape[0] == logits[0].shape[0]
+    )
+    stacked_logits = torch.stack(logits, dim=1)  # bz x seq_len x vocab_len
+    log_likelihoods = []
+    for logits_2d, output_ids_1d in zip(stacked_logits, output_ids):
+        log_likelihoods += [
+            torch.gather(
+                input=torch.log_softmax(logits_2d, dim=1),
+                dim=1,
+                index=output_ids_1d[:, None],
+            )
+            .sum()
+            .item()
+        ]
+    return torch.tensor(log_likelihoods)
+
+
 def custom_generate(
-    model, model_name, batch_source_input_ids, batch_attention_mask, cfg
+    model, tokenizer, model_name, batch_source_input_ids, batch_attention_mask, cfg
 ):
     if model_name == "allenai/led-large-16384-arxiv":
         # put global attention on <s> token as recommended in
@@ -364,8 +451,17 @@ def custom_generate(
             outputs = model.generate(
                 batch_source_input_ids,
                 attention_mask=batch_attention_mask,
+                eos_token_id=tokenizer.eos_token_id,
                 **cfg["generation"]["generate_kwargs"],
             )
+            if "sequences_scores" not in outputs:
+                # Compute pred scores i.e. log likelihoods
+                assert "logits" in outputs and outputs["logits"] is not None
+                assert "max_new_tokens" in cfg["generation"]["generate_kwargs"]
+                outputs["sequences_scores"] = compute_log_likelihoods(
+                    output_ids=outputs["sequences"],
+                    logits=outputs["logits"],
+                )
     return outputs["sequences"].to("cpu"), outputs["sequences_scores"].to("cpu")
 
 
@@ -466,6 +562,7 @@ def generate_generic_summary(run_name, cfg):
         batch_attention_mask = attention_mask[i * batch_size : (i + 1) * batch_size]
         output_seqs, output_seq_scores = custom_generate(
             model=model,
+            tokenizer=tokenizer,
             model_name=model_name,
             batch_source_input_ids=batch_source_input_ids,
             batch_attention_mask=batch_attention_mask,
@@ -503,9 +600,14 @@ def generate_e2e_summary(run_name, cfg):
     )
     # Generate by batch
     batch_size = cfg["generation"]["batch_size"]
-    num_batches = source_input_ids.shape[0] // batch_size + (
-        1 if source_input_ids.shape[0] % batch_size != 0 else 0
-    )
+    if "sample_size" in cfg["dataset"]:
+        num_batches = cfg["dataset"]["sample_size"] // batch_size + (
+            1 if cfg["dataset"]["sample_size"] % batch_size != 0 else 0
+        )
+    else:
+        num_batches = source_input_ids.shape[0] // batch_size + (
+            1 if source_input_ids.shape[0] % batch_size != 0 else 0
+        )
     # Generate summaries
     for i in tqdm(range(num_batches)):
         # Generate
@@ -513,6 +615,7 @@ def generate_e2e_summary(run_name, cfg):
         batch_attention_mask = attention_mask[i * batch_size : (i + 1) * batch_size]
         output_seqs, output_seq_scores = custom_generate(
             model=model,
+            tokenizer=tokenizer,
             model_name=model_name,
             batch_source_input_ids=batch_source_input_ids,
             batch_attention_mask=batch_attention_mask,

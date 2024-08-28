@@ -18,6 +18,13 @@ def read_jsonlines(file_path):
     return jsonlines_dict
 
 
+def get_values_from_jsonlines(jsonlines_data: list[dict], keys: list[str]) -> tuple:
+    values = {}
+    for key in keys:
+        values[key] = [elt[key] for elt in jsonlines_data]
+    return (values[key] for key in keys)
+
+
 def append_jsonlines(dict_to_write, output_directory, run_name):
     if not os.path.exists(output_directory):
         os.makedirs(output_directory)

@@ -1,5 +1,5 @@
 def get_question_column_name(dataset_name):
-    if dataset_name in ["covidet", "duc_single", "multioped", "qmsum"]:
+    if dataset_name in ["covidet", "duc_single", "multioped", "qmsum", "squality"]:
         return "question"
     elif dataset_name in ["debatepedia"]:
         return "query"

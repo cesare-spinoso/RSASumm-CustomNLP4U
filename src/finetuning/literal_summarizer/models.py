@@ -6,10 +6,8 @@ from torch.optim import AdamW
 from transformers import (
     AutoTokenizer,
     BartForConditionalGeneration,
-    LEDForConditionalGeneration,
     get_linear_schedule_with_warmup,
 )
-from peft import LoraConfig, get_peft_model
 
 from src import SCRATCH_CACHE_DIR
 
@@ -39,18 +37,8 @@ class LiteralSummarizerPLModule(pl.LightningModule):
             self.model = BartForConditionalGeneration.from_pretrained(
                 model_name, cache_dir=SCRATCH_CACHE_DIR
             ).to("cuda")
-        elif "led" in model_name:
-            self.model = LEDForConditionalGeneration.from_pretrained(
-                model_name, cache_dir=SCRATCH_CACHE_DIR
-            ).to("cuda")
         else:
             raise ValueError("Only BART models are supported, for now.")
-        if lora is not None:
-            # NOTE: Lora on smaller models does not work very well
-            self._print_trainable_parameters()
-            lora_config = LoraConfig(**lora)
-            self.model = get_peft_model(self.model, lora_config)
-            self._print_trainable_parameters()
         self.model_name = model_name
         self.tokenizer = tokenizer
         self.learning_rate = learning_rate
@@ -120,7 +108,7 @@ class LiteralSummarizerPLModule(pl.LightningModule):
         # Zero out the padding tokens:
         # https://colab.research.google.com/github/elsanns/xai-nlp-notebooks/blob/master/fine_tune_bart_summarization_two_langs.ipynb
         decoder_input_ids = label_ids.clone()
-        decoder_input_ids[decoder_input_ids[:, :] == self.tokenizer.pad_token_id] = -100
+        # decoder_input_ids[decoder_input_ids[:, :] == self.tokenizer.pad_token_id] = -100
         # If using LED, use the global attention mask as well
         # Set it to the first token as done in the notebook here
         # https://huggingface.co/allenai/led-large-16384 (also what the paper recommends for summarization)
@@ -226,14 +214,17 @@ class LiteralSummarizerPLModule(pl.LightningModule):
         wandb.log({f"{fold}_rouge_2": rouge_scores["rouge2"]})
         wandb.log({f"{fold}_rouge_L": rouge_scores["rougeL"]})
         # Log (same) example prediction
-        source_text = self.tokenizer.decode(source_ids[0, :], skip_special_tokens=True)
-        self.wandb_table.add_data(
-            source_text, reference_summaries[0], generated_summaries[0]
-        )
-        wandb.log({"example_table": self.wandb_table})
+        for i in range(len(generated_summaries)):
+            self.wandb_table.add_data(
+                self.tokenizer.decode(source_ids[i], skip_special_tokens=True),
+                reference_summaries[i],
+                generated_summaries[i],
+            )
+        wandb.log({f"example_table_{fold}_{self.global_step}": self.wandb_table})
 
     def on_train_epoch_end(self):
         self._log_avg_loss(fold="train")
+        self._log_rouge_scores(fold="train")
         # Free memory as: https://github.com/Lightning-AI/pytorch-lightning/pull/16520
         self.training_step_outputs.clear()
 

@@ -10,7 +10,7 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 HF_TOKEN = "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"
 
-DATASET_NAMES = {"covidet", "debatepedia", "duc_single", "multioped", "qmsum"}
+DATASET_NAMES = {"covidet", "debatepedia", "duc_single", "multioped", "qmsum", "squality"}
 
 METRICS_CACHE_DIR = os.path.join(SRC_DIRECTORY, "..", "data", "evaluation", "metrics_cache")
 

@@ -12,5 +12,6 @@ files:
   - train.jsonl
   - val.jsonl
   - test.jsonl
+data_split: test
 output_directory: /home/mila/c/cesare.spinoso/RSASumm/data/qmsum
 write_config_directory: /home/mila/c/cesare.spinoso/RSASumm/src/data/config_instances

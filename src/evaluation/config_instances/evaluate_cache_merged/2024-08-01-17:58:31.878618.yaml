@@ -1,0 +1,17 @@
+merged_scores_dir: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/merge_rescores/2024-08-01-15:17:04.799250
+dataset_names:
+- multioped
+- qmsum
+- squality
+summarizer_name: llama3_qfs
+metric: rouge
+lambda_interval: 0.05
+evaluations:
+- best_candidate
+- random_candidate
+- weighted_rsa
+- weighted_rsa_softmaxed
+write_config_directory: /home/mila/c/cesare.spinoso/RSASumm/src/evaluation/config_instances/evaluate_cache_merged
+output_directory: /home/mila/c/cesare.spinoso/RSASumm/data/evaluation/evaluate_cache_merged
+commit: false
+finished_running: false

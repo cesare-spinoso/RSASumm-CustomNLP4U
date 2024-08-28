@@ -1,0 +1,48 @@
+llama3_qfs_standard_beam:
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/answer_reconstruction/answer_reconstruction/llama3_qfs_standard_beam/2024-08-12-15:51:27.430156.jsonl
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/answer_reconstruction/answer_reconstruction/llama3_qfs_standard_beam/2024-08-11-17:28:54.909949.jsonl
+  squality: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/answer_reconstruction/answer_reconstruction/llama3_qfs_standard_beam/2024-08-11-17:28:55.451557.jsonl
+llama3_qfs_temp_2:
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/answer_reconstruction/answer_reconstruction/llama3_qfs_temp_2/2024-08-08-15:13:12.321351.jsonl
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/answer_reconstruction/answer_reconstruction/llama3_qfs_temp_2/2024-08-08-17:55:12.940941.jsonl
+  squality: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/answer_reconstruction/answer_reconstruction/llama3_qfs_temp_2/2024-08-08-21:04:26.035760.jsonl
+llama3_qfs_nucleus_0.95:
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/answer_reconstruction/answer_reconstruction/llama3_qfs_nucleus_0.95/2024-08-08-15:23:46.745368.jsonl
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/answer_reconstruction/answer_reconstruction/llama3_qfs_nucleus_0.95/2024-08-08-18:20:35.723122.jsonl
+  squality: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/answer_reconstruction/answer_reconstruction/llama3_qfs_nucleus_0.95/2024-08-08-21:10:08.069284.jsonl
+llama3_qfs_topk_640:
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/answer_reconstruction/answer_reconstruction/llama3_qfs_topk_640/2024-08-08-14:54:55.999772.jsonl
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/answer_reconstruction/answer_reconstruction/llama3_qfs_topk_640/2024-08-12-16:36:52.657810.jsonl
+  squality: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/answer_reconstruction/answer_reconstruction/llama3_qfs_topk_640/2024-08-08-21:15:50.917502.jsonl
+llama3_qfs_nucleus_0.95_temp_1.2:
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/answer_reconstruction/answer_reconstruction/llama3_qfs_nucleus_0.95_temp_1.2/2024-08-08-15:34:02.508870.jsonl
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/answer_reconstruction/answer_reconstruction/llama3_qfs_nucleus_0.95_temp_1.2/2024-08-08-19:06:06.668306.jsonl
+  squality: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/answer_reconstruction/answer_reconstruction/llama3_qfs_nucleus_0.95_temp_1.2/2024-08-08-21:21:33.357269.jsonl
+llama3_qfs_nucleus_0.95_temp_1.5:
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/answer_reconstruction/answer_reconstruction/llama3_qfs_nucleus_0.95_temp_1.5/2024-08-08-15:44:17.595924.jsonl
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/answer_reconstruction/answer_reconstruction/llama3_qfs_nucleus_0.95_temp_1.5/2024-08-08-19:30:29.458824.jsonl
+  squality: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/answer_reconstruction/answer_reconstruction/llama3_qfs_nucleus_0.95_temp_1.5/2024-08-08-21:27:16.360782.jsonl
+bart_finetuned_qfs_standard_beam:
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/answer_reconstruction/answer_reconstruction/bart_finetuned_qfs_standard_beam/2024-08-11-17:30:01.071411.jsonl
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/answer_reconstruction/answer_reconstruction/bart_finetuned_qfs_standard_beam/2024-08-11-17:53:19.221901.jsonl
+  squality: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/answer_reconstruction/answer_reconstruction/bart_finetuned_qfs_standard_beam/2024-08-11-17:35:22.310740.jsonl
+bart_finetuned_qfs_temp_2:
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/answer_reconstruction/answer_reconstruction/bart_finetuned_qfs_temp_2/2024-08-08-16:43:16.944794.jsonl
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/answer_reconstruction/answer_reconstruction/bart_finetuned_qfs_temp_2/2024-08-08-19:55:04.388088.jsonl
+  squality: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/answer_reconstruction/answer_reconstruction/bart_finetuned_qfs_temp_2/2024-08-08-21:32:59.257238.jsonl
+bart_finetuned_qfs_nucleus_0.95:
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/answer_reconstruction/answer_reconstruction/bart_finetuned_qfs_nucleus_0.95/2024-08-08-16:50:48.570545.jsonl
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/answer_reconstruction/answer_reconstruction/bart_finetuned_qfs_nucleus_0.95/2024-08-08-21:04:36.650264.jsonl
+  squality: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/answer_reconstruction/answer_reconstruction/bart_finetuned_qfs_nucleus_0.95/2024-08-08-21:38:42.071083.jsonl
+bart_finetuned_qfs_topk_640:
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/answer_reconstruction/answer_reconstruction/bart_finetuned_qfs_topk_640/2024-08-08-16:57:51.022370.jsonl
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/answer_reconstruction/answer_reconstruction/bart_finetuned_qfs_topk_640/2024-08-08-21:21:50.592219.jsonl
+  squality: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/answer_reconstruction/answer_reconstruction/bart_finetuned_qfs_topk_640/2024-08-08-21:44:17.171972.jsonl
+bart_finetuned_qfs_nucleus_0.95_temp_1.2:
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/answer_reconstruction/answer_reconstruction/bart_finetuned_qfs_nucleus_0.95_temp_1.2/2024-08-08-17:04:53.867222.jsonl
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/answer_reconstruction/answer_reconstruction/bart_finetuned_qfs_nucleus_0.95_temp_1.2/2024-08-08-21:38:51.461693.jsonl
+  squality: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/answer_reconstruction/answer_reconstruction/bart_finetuned_qfs_nucleus_0.95_temp_1.2/2024-08-08-21:49:51.695904.jsonl
+bart_finetuned_qfs_nucleus_0.95_temp_1.5:
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/answer_reconstruction/answer_reconstruction/bart_finetuned_qfs_nucleus_0.95_temp_1.5/2024-08-08-17:11:56.533951.jsonl
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/answer_reconstruction/answer_reconstruction/bart_finetuned_qfs_nucleus_0.95_temp_1.5/2024-08-08-21:56:09.512344.jsonl
+  squality: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/answer_reconstruction/answer_reconstruction/bart_finetuned_qfs_nucleus_0.95_temp_1.5/2024-08-08-21:55:27.215123.jsonl

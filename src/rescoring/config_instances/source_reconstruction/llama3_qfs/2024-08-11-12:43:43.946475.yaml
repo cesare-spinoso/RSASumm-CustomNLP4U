@@ -1,0 +1,22 @@
+dataset_name: qmsum
+tokenizer:
+  name: meta-llama/Meta-Llama-3-8B-Instruct
+model:
+  name: meta-llama/Meta-Llama-3-8B-Instruct
+rescoring:
+  type: source_reconstruction
+  preprocessed_dataset_path: /home/mila/c/cesare.spinoso/RSASumm/data/qmsum/test_new.csv
+  generated_summaries_yaml: /home/mila/c/cesare.spinoso/RSASumm/src/generate_summaries/generated_summaries/qfs_summaries.yaml
+  batch_size: 1
+  prompt: '<|start_header_id|>system<|end_header_id|>You are a helpful, respectful
+    and honest assistant specializing in the reconstruction of source documnets given
+    their summary.<|eot_id|><|start_header_id|>user<|end_header_id|> Read the following
+    summary and then regenerate the source document that it was about. Your regeneration
+    should be as close to the original source document as possible. Do not provide
+    anything else other than the reconstructed source document. Summary: {s} Source:
+    <|eot_id|><|start_header_id|>assistant<|end_header_id|>'
+  rescored_summaries_jsonl_path: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/llama3_qfs_topk_640/2024-08-09-14:31:07.916709.jsonl
+output_directory: /network/scratch/c/cesare.spinoso/rsasumm/rescoring
+write_config_directory: /home/mila/c/cesare.spinoso/RSASumm/src/rescoring/config_instances/source_reconstruction/llama3_qfs
+summarizer_name: llama3_qfs_topk_640
+finished_running: true

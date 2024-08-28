@@ -1,0 +1,30 @@
+dataset:
+  name: qmsum
+  preprocessed_dataset_path: /home/mila/c/cesare.spinoso/RSASumm/data/qmsum/test_new.csv
+  notify_size: 100
+tokenizer:
+  name: meta-llama/Meta-Llama-3-8B-Instruct
+  model_max_length: 4096
+model:
+  name: meta-llama/Meta-Llama-3-8B-Instruct
+qgen:
+  num_questions: 10
+  prompt: '<|start_header_id|>system<|end_header_id|>You are a helpful, respectful
+    and honest assistant specializing in question generation.<|eot_id|><|start_header_id|>user<|end_header_id|>
+    Read the following document and then generate {n} related questions. The questions
+    should be diverse and should ask about different aspects related to the document.
+    No two questions should be asking about the same thing and each question should
+    be a wh-question. Do not provide anything else other than generated questions
+    separaterd by commas. Document: {d} Questions: |eot_id|><|start_header_id|>assistant<|end_header_id|>'
+  batch_size: 1
+  generated_questions_path: /home/mila/c/cesare.spinoso/RSASumm/data/generate_questions/2024-07-24-11:06:22.077393.jsonl
+  generate_kwargs:
+    num_beams: 5
+    num_return_sequences: 1
+    max_new_tokens: 300
+    early_stopping: true
+    return_dict_in_generate: true
+commit: false
+output_directory: /network/scratch/c/cesare.spinoso/rsasumm/generate_questions
+write_config_directory: /home/mila/c/cesare.spinoso/RSASumm/src/generate_questions/config_instances/llama3
+finished_running: true

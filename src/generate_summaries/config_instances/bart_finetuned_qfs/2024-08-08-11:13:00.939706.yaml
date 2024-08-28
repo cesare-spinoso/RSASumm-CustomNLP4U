@@ -1,0 +1,28 @@
+dataset:
+  name: qmsum
+  path: /home/mila/c/cesare.spinoso/RSASumm/data/qmsum/test_new.csv
+  source_name: document
+  question_name: question
+  reference_name: summary
+  document_id_name: document_id
+tokenizer:
+  name: facebook/bart-large
+model:
+  name: facebook/bart-large
+  path_to_checkpoint: /network/scratch/c/cesare.spinoso/rsasumm/finetuning/2024-08-07-13:13:00.267260/lightning_logs/version_0/checkpoints/epoch=49-step=1750.ckpt
+generation:
+  batch_size: 5
+  summary_type: e2e
+  generate_kwargs:
+    num_return_sequences: 10
+    num_beams: null
+    max_new_tokens: 300
+    output_scores: true
+    output_logits: true
+    return_dict_in_generate: true
+    do_sample: true
+    temperature: 2.0
+output_directory: /network/scratch/c/cesare.spinoso/rsasumm/generate_summaries/bart_finetuned_qfs
+write_config_directory: /home/mila/c/cesare.spinoso/RSASumm/src/generate_summaries/config_instances/bart_finetuned_qfs
+commit: false
+finished_running: true

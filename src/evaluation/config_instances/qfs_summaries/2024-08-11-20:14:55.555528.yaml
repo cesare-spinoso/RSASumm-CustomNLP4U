@@ -1,0 +1,19 @@
+merged_scores_yaml: /home/mila/c/cesare.spinoso/RSASumm/src/rescoring/merged_rescores/merged_rescores.yaml
+summarizer_names:
+- llama3_qfs_nucleus_0
+dataset_names:
+- multioped
+- qmsum
+- squality
+metric: meteor
+evaluations:
+- best_candidate
+- random_candidate
+- S0-only
+- R1-only
+- weighted_rsa
+- weighted_rsa_scaled_lambda
+write_config_directory: /home/mila/c/cesare.spinoso/RSASumm/src/evaluation/config_instances/qfs_summaries
+output_directory: /home/mila/c/cesare.spinoso/RSASumm/data/evaluation/qfs_summaries
+commit: false
+finished_running: false

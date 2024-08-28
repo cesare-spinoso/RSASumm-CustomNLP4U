@@ -1,25 +1,17 @@
-from collections import OrderedDict
 import os
 
 import hydra
 import pandas as pd
-from hydra.core.hydra_config import HydraConfig
 from omegaconf import DictConfig
 
 from src import DATASET_NAMES, SRC_DIRECTORY
-from src.rescoring.rescore_summaries import get_latent_column_name
+from src.rescoring.rescore_summaries import process_llama3_preds
+from src.utils.dataset import get_question_column_name
 from src.utils.decorators import main_decorator
 from src.utils.helper import get_jsonl_path_from_yaml, read_jsonlines
 
 
 def sanity_check_config(cfg):
-    hydra_job = HydraConfig.get().job
-    hydra_runtime = HydraConfig.get().runtime
-    assert cfg["summarizer_name"] == hydra_job["config_name"]
-    assert any(
-        "merge_rescores" in dict_elt["path"]
-        for dict_elt in hydra_runtime["config_sources"]
-    )
     assert (
         isinstance(cfg["datasets"], list) and set(cfg["datasets"]) <= DATASET_NAMES
     ) or (
@@ -32,8 +24,10 @@ def sanity_check_config(cfg):
             for s in [
                 "generic_summaries",
                 "e2e_summaries",
+                "qfs_summaries",
                 "source_reconstruction",
                 "latent_reconstruction",
+                "answer_reconstruction",
             ]
         )
         for k in cfg["yaml_files"]
@@ -62,89 +56,117 @@ def rename_columns(df, name):
     return df
 
 
-def merge_rescored_generic_summaries(dataset_name, cfg):
-    # Preprocess input needed to compute metrics
-    ordered_keys = [cfg["summarizer_name"], dataset_name]
-    # Read jsonlines data
-    dfs = OrderedDict()
-    for name, yaml_path in cfg["yaml_files"].items():
-        jsonlines_path = get_jsonl_path_from_yaml(ordered_keys, yaml_path)
-        jsonlines_data = read_jsonlines(jsonlines_path)
-        df = pd.DataFrame(jsonlines_data)
-        # NOTE: Some  predictions are "", we still use them for the merge
-        if cfg["rename_columns"]:
-            df = rename_columns(df, name)
-        dfs[name] = df
-    # Merge three dataframes
-    merged_df = None
-    for df in dfs.values():
-        if merged_df is None:
-            merged_df = df
-        else:
-            merged_df = pd.merge(merged_df, df, on=cfg["columns_to_merge_on"])
-    # Drop any nan's introduced, e.g. because pred is empty
-    merged_df = merged_df.dropna()
-    return merged_df
-
-
-def merge_rescored_e2e_summaries(dataset_name, dataset_path, cfg):
+def merge_rescored_qfs_summaries(dataset_name, cfg):
+    print("=" * 60)
+    print(f"Merging for {dataset_name} summaries.")
     # Read the csv file
+    dataset_path = cfg["datasets"][dataset_name]
     df_raw = pd.read_csv(dataset_path)
-    latent_column_name = get_latent_column_name(dataset_name)
-    # Get the summary df and add the latent column to it
-    # from the question
+    question_column_name = get_question_column_name(dataset_name)
+    df_raw = df_raw[["document", question_column_name, "summary"]]
+    df_raw.rename(
+        columns={"document": "source", "summary": "reference_summary"}, inplace=True
+    )
+    print(f"{len(df_raw)=}")
+    # Get the summary df
     ordered_keys = [cfg["summarizer_name"], dataset_name]
-    yaml_path = cfg["yaml_files"]["e2e_summaries"]
+    yaml_path = cfg["yaml_files"]["qfs_summaries"]
     jsonlines_path = get_jsonl_path_from_yaml(ordered_keys, yaml_path)
     summary_jsonlines = read_jsonlines(jsonlines_path)
-    df_summary = pd.DataFrame(summary_jsonlines)
-    if dataset_name == "covidet":
-        df_raw["question"] = df_raw["emotion"].apply(
-            lambda x: cfg["covidet_template"].format(emotion=x)
-        )
-    elif dataset_name == "debatepedia":
-        df_raw["question"] = df_raw["query"]
-    question_to_latent = dict(
-        zip(
-            df_raw["question"].tolist(),
-            df_raw[latent_column_name],
-        )
-    )
-    latent = [question_to_latent[q] for q in df_summary["question"]]
-    df_summary[latent_column_name] = latent
-    df_summary = df_summary[
-        ["document_id", "source", "pred", "pred_score", latent_column_name]
+    df_generated_summary = pd.DataFrame(summary_jsonlines)
+    df_generated_summary = df_generated_summary[
+        ["source", question_column_name, "pred", "pred_score"]
     ]
-    # Merge the reconstruction scores from source
-    source_yaml_path = cfg["yaml_files"]["source_reconstruction"]
-    source_jsonlines_path = get_jsonl_path_from_yaml(ordered_keys, source_yaml_path)
-    source_rec_jsonlines = read_jsonlines(source_jsonlines_path)
-    input_to_score = {
-        (elt["source"], elt["pred"]): elt["reconstruction_score"]
-        for elt in source_rec_jsonlines
-    }
-    input_to_avg_score = {
-        (elt["source"], elt["pred"]): elt["avg_reconstruction_score"]
-        for elt in source_rec_jsonlines
-    }
-    df_summary["source_rec_score"] = df_summary.apply(
-        lambda x: input_to_score[(x["source"], x["pred"])], axis=1
+    df_generated_summary.rename(columns={"pred": "generated_summary"}, inplace=True)
+    if "llama3" in cfg["summarizer_name"]:
+        df_generated_summary["generated_summary"] = process_llama3_preds(
+            df_generated_summary["generated_summary"].tolist(), pred_type="summary"
+        )
+    print(f"{len(df_generated_summary)=}")
+    # Merge the generated summary with the raw data
+    df_merged = pd.merge(
+        df_raw, df_generated_summary, on=["source", question_column_name]
     )
-    df_summary["avg_source_rec_score"] = df_summary.apply(
-        lambda x: input_to_avg_score[(x["source"], x["pred"])], axis=1
-    )
-    # Merge the latent reconstruction
-    # NOTE: The pred score for the same summary can be different
-    # so merged_df may have length > len(df_summary) or len(df_latent)
-    latent_yaml_path = cfg["yaml_files"]["latent_reconstruction"]
-    jsonlines_path = get_jsonl_path_from_yaml(ordered_keys, latent_yaml_path)
-    latent_rec_jsonlines = read_jsonlines(jsonlines_path)
-    df_latent = pd.DataFrame(latent_rec_jsonlines)
-    df_latent = rename_columns(df_latent, "latent_reconstruction")
-    merged_df = pd.merge(
-        df_summary, df_latent, on=["document_id", "source", "pred", latent_column_name]
-    )
-    return merged_df
+    print(f"{len(df_merged)=}")
+    # Get the answer reconstruction scores
+    if "answer_reconstruction" in cfg["yaml_files"]:
+        ordered_keys = [cfg["summarizer_name"], dataset_name]
+        yaml_path = cfg["yaml_files"]["answer_reconstruction"]
+        jsonlines_path = get_jsonl_path_from_yaml(ordered_keys, yaml_path)
+        answer_rec_jsonlines = read_jsonlines(jsonlines_path)
+        df_answer_rec = pd.DataFrame(answer_rec_jsonlines)
+        df_answer_rec = df_answer_rec[
+            [
+                "source",
+                question_column_name,
+                "summary",
+                "answer",
+                "reconstruction_score",
+                "avg_reconstruction_score",
+            ]
+        ]
+        df_answer_rec.rename(
+            columns={
+                "summary": "generated_summary",
+                "answer": "generated_answer",
+                "reconstruction_score": "ans_rec_score",
+                "avg_reconstruction_score": "avg_ans_rec_score",
+            },
+            inplace=True,
+        )
+        print(f"{len(df_answer_rec)=}")
+        # Merge the answer reconstruction scores with the generated summary
+        df_merged = pd.merge(
+            df_merged,
+            df_answer_rec,
+            on=["source", question_column_name, "generated_summary"],
+        )
+        print(f"{len(df_merged)=}")
+    # Get the source reconstruction scores
+    if "source_reconstruction" in cfg["yaml_files"]:
+        ordered_keys = [cfg["summarizer_name"], dataset_name]
+        yaml_path = cfg["yaml_files"]["source_reconstruction"]
+        jsonlines_path = get_jsonl_path_from_yaml(ordered_keys, yaml_path)
+        source_rec_jsonlines = read_jsonlines(jsonlines_path)
+        df_source_rec = pd.DataFrame(source_rec_jsonlines)
+        start_marker = "Do not provide anything else other than the reconstructed source document. Summary:"
+        end_marker = "Source: <|eot_id|><|start_header_id|>assistant<|end_header_id|>"
+        assert (
+            df_source_rec["pred"].apply(lambda x: len(x.split(start_marker)) == 2).all()
+        )
+        assert (
+            df_source_rec["pred"].apply(lambda x: len(x.split(end_marker)) == 2).all()
+        )
+        df_source_rec["pred"] = df_source_rec["pred"].apply(
+            lambda x: x.split(start_marker)[-1].split(end_marker)[0].strip()
+        )
+        df_source_rec = df_source_rec[
+            ["source", "pred", "reconstruction_score", "reconstruction_score"]
+        ]
+        df_source_rec.rename(
+            columns={
+                "pred": "generated_summary",
+                "reconstruction_score": "source_rec_score",
+                "avg_reconstruction_score": "source_avg_rec_score",
+            },
+            inplace=True,
+        )
+        assert df_source_rec["source"].isin(df_merged["source"]).all()
+        df_merged["generated_summary"] = df_merged["generated_summary"].apply(
+            lambda x: x.strip()
+        )
+        assert (
+            df_source_rec["generated_summary"]
+            .isin(df_merged["generated_summary"])
+            .all()
+        )
+        df_merged = pd.merge(
+            df_merged,
+            df_source_rec,
+            on=["source", "generated_summary"],
+        )
+        print(f"{len(df_merged)=}")
+    return df_merged
 
 
 @hydra.main(
@@ -155,19 +177,22 @@ def merge_rescored_e2e_summaries(dataset_name, dataset_path, cfg):
 def main(run_name: str, cfg: DictConfig):
     sanity_check_config(cfg)
     for dataset_name in cfg["datasets"]:
-        if "generic" in cfg["summarizer_name"]:
-            df = merge_rescored_generic_summaries(dataset_name=dataset_name, cfg=cfg)
-        elif "e2e" in cfg["summarizer_name"]:
-            df = merge_rescored_e2e_summaries(
-                dataset_name=dataset_name,
-                dataset_path=cfg["datasets"][dataset_name],
-                cfg=cfg,
-            )
+        if "qfs" in cfg["summarizer_name"]:
+            df = merge_rescored_qfs_summaries(dataset_name=dataset_name, cfg=cfg)
         else:
             raise ValueError(f"Unknown summarizer name: {cfg['summarizer_name']}")
         os.makedirs(os.path.join(cfg["output_directory"], run_name), exist_ok=True)
         df.to_csv(
             os.path.join(cfg["output_directory"], run_name, f"{dataset_name}.csv"),
+            index=False,
+        )
+        df = df.map(
+            lambda x: (
+                x.encode("unicode_escape").decode("utf-8") if isinstance(x, str) else x
+            )
+        )
+        df.to_excel(
+            os.path.join(cfg["output_directory"], run_name, f"{dataset_name}.xlsx"),
             index=False,
         )
 
