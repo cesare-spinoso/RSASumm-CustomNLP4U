@@ -5,3 +5,5 @@ bart_e2e: /home/mila/c/cesare.spinoso/RSASumm/data/evaluation/evaluate_cache_mer
 led_e2e: /home/mila/c/cesare.spinoso/RSASumm/data/evaluation/evaluate_cache_merged/2024-04-12-14:54:14.203244/led_e2e.json
 llama2_e2e: /home/mila/c/cesare.spinoso/RSASumm/data/evaluation/evaluate_cache_merged/2024-04-12-14:54:14.203244/llama2_e2e.json
 bart_e2e_finetuned: /home/mila/c/cesare.spinoso/RSASumm/data/evaluation/evaluate_cache_merged/2024-04-25-15:24:50.228383/bart_e2e_finetuned.json
+# Missing some rows for one of the qmsums
+llama_and_bart_finetuned_qfs: /home/mila/c/cesare.spinoso/RSASumm/data/evaluation/qfs_summaries/2024-08-09-11:47:33.538623

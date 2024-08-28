@@ -1,3 +1,4 @@
+# TODO: Add other metrics, check that these are from peer-reviewed papers, and add references
 covidet:
   rouge1: 0.2619
   rouge2: 0.0685

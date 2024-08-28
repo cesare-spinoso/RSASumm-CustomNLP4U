@@ -136,16 +136,34 @@ def qmsum_preprocess(cfg):
         with jsonlines.open(file_path) as reader:
             for obj in reader:
                 data.append(obj)
-    preprocessed_data = dict.fromkeys(cfg["column_names"], None)
+    preprocessed_data = dict.fromkeys(cfg["column_names"] + ["original_question"], None)
     preprocessed_data = {k: [] for k in preprocessed_data.keys()}
     for json_dict in data:
         document_list = json_dict["meeting_transcripts"]
         for query_dict in json_dict["specific_query_list"]:
-            preprocessed_data["question"].append(query_dict["query"])
-            preprocessed_data["summary"].append(query_dict["answer"])
-            preprocessed_data["document"].append(
-                extract_qmsum_doc(document_list, query_dict["relevant_text_span"])
-            )
+            question = query_dict["query"]
+            if any(
+                wh_word in question.lower()
+                for wh_word in ["who", "what", "where", "why", "when", "how"]
+            ):
+                preprocessed_data["original_question"].append(question)
+                preprocessed_data["question"].append(question)
+                preprocessed_data["summary"].append(query_dict["answer"])
+                preprocessed_data["document"].append(
+                    extract_qmsum_doc(document_list, query_dict["relevant_text_span"])
+                )
+            elif "summarize the discussion about" in question.lower():
+                preprocessed_data["original_question"].append(question)
+                preprocessed_data["question"].append(
+                    question.lower().replace(
+                        "summarize the discussion about", "what was discussed about"
+                    )
+                )
+                preprocessed_data["summary"].append(query_dict["answer"])
+                preprocessed_data["document"].append(
+                    extract_qmsum_doc(document_list, query_dict["relevant_text_span"])
+                )
+
     assert (
         (num_samples := len(preprocessed_data["document"]))
         == len(preprocessed_data["question"])
@@ -325,12 +343,63 @@ def write_preprocesed_data(preprocessed_data, cfg):
         preprocessed_data = prostprocess_multioped(preprocessed_data, cfg)
     # Write to csv
     if "data_split" in cfg:
-        path_to_write = os.path.join(
-            cfg["output_directory"], f"{cfg['data_split']}.csv"
-        )
+        if cfg["dataset_name"] == "multioped":
+            path_to_write = os.path.join(
+                cfg["output_directory"], f"{cfg['data_split']}_new.csv"
+            )
+        else:
+            path_to_write = os.path.join(
+                cfg["output_directory"], f"{cfg['data_split']}.csv"
+            )
     else:
         path_to_write = os.path.join(cfg["output_directory"], "preprocessed.csv")
     preprocessed_data.to_csv(path_to_write, index=False)
+    if cfg["dataset_name"] == "squality" and "test" in cfg["files"][0]:
+        preprocessed_data.to_excel(path_to_write.replace(".csv", ".xlsx"), index=False)
+
+
+def squality_preprocess(cfg):
+    raw_directory = cfg["raw_data_dir_path"]
+    data = []
+    for file_name in cfg["files"]:
+        file_path = os.path.join(raw_directory, file_name)
+        with jsonlines.open(file_path) as reader:
+            for obj in reader:
+                data.append(obj)
+    preprocessed_data = dict.fromkeys(cfg["column_names"] + ["original_question"], None)
+    preprocessed_data = {k: [] for k in preprocessed_data.keys()}
+    for i, json_dict in enumerate(data):
+        document = json_dict["document"]
+        question_dicts = json_dict["questions"]
+        for question_dict in question_dicts:
+            og_question = question_dict["question_text"]
+            if any(split in file_name for split in ["train", "val"]):
+                new_question = og_question
+            else:
+                new_question = og_question.lower()
+                if new_question.startswith("describe the"):
+                    new_question = new_question.replace(
+                        "describe the", "what is the"
+                    )
+                if all(
+                    not new_question.startswith(wh_word)
+                    for wh_word in ["who", "what", "where", "why", "when", "how"]
+                ):
+                    continue
+            response_dicts = question_dict["responses"]
+            for response_dict in response_dicts:
+                response = response_dict["response_text"]
+                preprocessed_data["document"].append(document)
+                preprocessed_data["document_id"].append(i)
+                preprocessed_data["original_question"].append(og_question)
+                preprocessed_data["question"].append(new_question)
+                preprocessed_data["summary"].append(response)
+    assert (
+        len(preprocessed_data["document"])
+        == len(preprocessed_data["question"])
+        == len(preprocessed_data["summary"])
+    )
+    return preprocessed_data
 
 
 @hydra.main(
@@ -349,6 +418,8 @@ def main(run_name: str, cfg: dict):
         preprocessed_data = qmsum_preprocess(cfg)
     elif cfg["dataset_name"] == "duc_single":
         preprocessed_data = duc_preprocess(cfg)
+    elif cfg["dataset_name"] == "squality":
+        preprocessed_data = squality_preprocess(cfg)
     else:
         raise ValueError(f"No preprocessing for {cfg['dataset_name']} dataset")
     pass

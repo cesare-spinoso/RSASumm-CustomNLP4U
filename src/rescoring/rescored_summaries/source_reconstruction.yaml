@@ -1,58 +1,48 @@
-bart_generic:
-  covidet: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/bart_generic/2024-03-18-22:14:05.051838.jsonl
-  debatepedia: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/bart_generic/2024-04-07-16:40:33.751196.jsonl
-  duc_single: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/bart_generic/2024-04-07-16:59:17.673175.jsonl
-  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/bart_generic/2024-03-18-20:37:57.459428.jsonl
-  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/bart_generic/2024-04-07-16:41:34.392053.jsonl
-led_generic:
-  covidet: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/led_generic/2024-03-18-22:26:40.280410.jsonl
-  debatepedia: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/led_generic/2024-04-07-19:52:36.119373.jsonl
-  duc_single: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/led_generic/2024-04-07-19:53:39.419055.jsonl
-  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/led_generic/2024-03-18-20:39:05.005310.jsonl
-  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/led_generic/2024-04-07-20:02:35.554915.jsonl
-llama2_generic:
-  covidet: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/llama2_generic/2024-04-08-00:37:33.140856.jsonl
-  debatepedia: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/llama2_generic/2024-04-08-10:58:46.039399.jsonl
-  duc_single: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/llama2_generic/2024-04-08-00:08:47.581353.jsonl
-  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/llama2_generic/2024-04-08-11:43:36.882539.jsonl
-  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/llama2_generic/2024-04-08-00:20:28.203653.jsonl
-peg_generic:
-  covidet: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/peg_generic/2024-03-18-21:56:53.191444.jsonl
-  debatepedia: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/peg_generic/2024-03-18-21:22:57.252724.jsonl
-  duc_single: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/peg_generic/2024-03-18-23:45:07.654315.jsonl
-  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/peg_generic/2024-03-18-20:56:07.465959.jsonl
-  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/peg_generic/2024-03-18-20:40:06.423046.jsonl
-t5_generic:
-  covidet: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/t5_generic/2024-03-18-22:31:56.916763.jsonl
-  debatepedia: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/t5_generic/2024-03-18-21:12:14.102232.jsonl
-  duc_single: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/t5_generic/2024-03-18-22:14:26.576652.jsonl
-  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/t5_generic/2024-03-18-21:47:35.707870.jsonl
-  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/t5_generic/2024-03-18-20:55:55.689676.jsonl
-bart_e2e:
-  covidet: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/bart_e2e/2024-03-29-15:29:31.489811.jsonl
-  debatepedia: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/bart_e2e/2024-04-01-16:53:11.682617.jsonl
-  duc_single: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/bart_e2e/2024-03-29-15:18:47.113986.jsonl
-  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/bart_e2e/2024-03-29-15:07:51.199008.jsonl
-  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/bart_e2e/2024-03-29-15:16:08.086372.jsonl
-led_e2e:
-  covidet: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/led_e2e/2024-03-29-15:45:48.223585.jsonl
-  debatepedia: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/led_e2e/2024-04-01-16:48:03.645027.jsonl
-  duc_single: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/led_e2e/2024-03-29-15:31:28.317647.jsonl
-  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/led_e2e/2024-03-29-15:23:00.105666.jsonl
-  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/led_e2e/2024-03-29-15:28:45.596816.jsonl
-llama2_e2e:
-  covidet: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/llama2_e2e/2024-04-08-00:28:27.013602.jsonl
-  debatepedia: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/llama2_e2e/2024-04-08-00:04:35.620315.jsonl
-  duc_single: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/llama2_e2e/2024-04-08-00:16:44.551794.jsonl
-  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/llama2_e2e/2024-04-08-00:07:57.195668.jsonl
-  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/llama2_e2e/2024-04-08-00:13:53.736009.jsonl
-bart_large_cnn_e2e_finetuned:
-  covidet: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/bart_e2e_finetuned/2024-04-25-14:29:29.278555.jsonl
-  debatepedia: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/bart_e2e_finetuned/2024-04-25-14:37:43.752851.jsonl
-  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/bart_e2e_finetuned/2024-04-25-14:41:04.323482.jsonl
-  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/bart_e2e_finetuned/2024-04-25-14:47:33.750688.jsonl
-bart_large_base_e2e_finetuned:
-  covidet: 
-  debatepedia: 
-  multioped: 
-  qmsum: 
+llama3_qfs_standard_beam:
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/llama3_qfs_standard_beam/2024-08-11-17:31:46.661315.jsonl
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/llama3_qfs_standard_beam/2024-08-11-17:31:46.925656.jsonl
+  squality: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/llama3_qfs_standard_beam/2024-08-11-17:31:55.892600.jsonl
+llama3_qfs_temp_2:
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/llama3_qfs_temp_2/2024-08-09-10:14:17.730658.jsonl
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/llama3_qfs_temp_2/2024-08-11-12:37:09.645301.jsonl 
+  squality: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/llama3_qfs_temp_2/2024-08-10-04:37:34.895032.jsonl
+llama3_qfs_nucleus_0.95:
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/llama3_qfs_nucleus_0.95/2024-08-09-10:58:26.854519.jsonl
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/llama3_qfs_nucleus_0.95/2024-08-09-12:39:16.964838.jsonl
+  squality: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/llama3_qfs_nucleus_0.95/2024-08-10-06:26:25.173563.jsonl
+llama3_qfs_topk_640:
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/llama3_qfs_topk_640/2024-08-09-11:42:25.883591.jsonl
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/llama3_qfs_topk_640/2024-08-11-17:19:53.742253.jsonl
+  squality: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/llama3_qfs_topk_640/2024-08-10-08:15:23.458430.jsonl
+llama3_qfs_nucleus_0.95_temp_1.2:
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/llama3_qfs_nucleus_0.95_temp_1.2/2024-08-09-12:26:23.707570.jsonl
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/llama3_qfs_nucleus_0.95_temp_1.2/2024-08-11-12:52:53.284295.jsonl
+  squality: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/llama3_qfs_nucleus_0.95_temp_1.2/2024-08-10-10:04:25.201808.jsonl
+llama3_qfs_nucleus_0.95_temp_1.5:
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/llama3_qfs_nucleus_0.95_temp_1.5/2024-08-09-13:10:26.464897.jsonl
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/llama3_qfs_nucleus_0.95_temp_1.5/2024-08-11-14:01:15.543635.jsonl
+  squality: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/llama3_qfs_nucleus_0.95_temp_1.5/2024-08-10-11:53:09.334554.jsonl
+bart_finetuned_qfs_standard_beam:
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/bart_finetuned_qfs_standard_beam/2024-08-12-17:40:31.244470.jsonl
+  qmsum:
+  squality: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/bart_finetuned_qfs_standard_beam/2024-08-12-17:37:30.808278.jsonl
+bart_finetuned_qfs_temp_2:
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/bart_finetuned_qfs_temp_2/2024-08-09-13:54:23.300982.jsonl
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/bart_finetuned_qfs_temp_2/2024-08-09-18:45:51.572035.jsonl
+  squality: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/bart_finetuned_qfs_temp_2/2024-08-10-13:41:54.754906.jsonl
+bart_finetuned_qfs_nucleus_0.95:
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/bart_finetuned_qfs_nucleus_0.95/2024-08-09-14:36:15.228663.jsonl
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/bart_finetuned_qfs_nucleus_0.95/2024-08-12-17:37:30.205796.jsonl # - still missing 6
+  squality: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/bart_finetuned_qfs_nucleus_0.95/2024-08-10-15:30:31.326569.jsonl
+bart_finetuned_qfs_topk_640:
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/bart_finetuned_qfs_topk_640/2024-08-09-15:18:13.685388.jsonl
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/bart_finetuned_qfs_topk_640/2024-08-11-15:12:13.079897.jsonl
+  squality: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/bart_finetuned_qfs_topk_640/2024-08-10-17:18:53.525615.jsonl
+bart_finetuned_qfs_nucleus_0.95_temp_1.2:
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/bart_finetuned_qfs_nucleus_0.95_temp_1.2/2024-08-09-16:00:10.543452.jsonl
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/bart_finetuned_qfs_nucleus_0.95_temp_1.2/2024-08-09-21:59:48.973194.jsonl
+  squality: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/bart_finetuned_qfs_nucleus_0.95_temp_1.2/2024-08-10-19:08:43.170713.jsonl
+bart_finetuned_qfs_nucleus_0.95_temp_1.5:
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/bart_finetuned_qfs_nucleus_0.95_temp_1.5/2024-08-09-16:42:13.326302.jsonl
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/bart_finetuned_qfs_nucleus_0.95_temp_1.5/2024-08-09-23:47:50.651190.jsonl
+  squality: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/source_reconstruction/bart_finetuned_qfs_nucleus_0.95_temp_1.5/2024-08-10-20:56:39.826606.jsonl

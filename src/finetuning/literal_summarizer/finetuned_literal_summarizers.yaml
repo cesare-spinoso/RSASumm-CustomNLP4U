@@ -8,3 +8,7 @@ bart_large_base_e2e_finetuned:
   debatepedia: /home/mila/c/cesare.spinoso/RSASumm/src/finetuning/literal_summarizer/config_instances/bart/2024-05-01-14:49:49.900152.yaml
   multioped: /home/mila/c/cesare.spinoso/RSASumm/src/finetuning/literal_summarizer/config_instances/bart/2024-05-01-15:46:57.952391.yaml
   qmsum: /home/mila/c/cesare.spinoso/RSASumm/src/finetuning/literal_summarizer/config_instances/bart/2024-05-01-14:51:13.704299.yaml
+bart_large_base_qfs_finetuned:
+  multioped: /network/scratch/c/cesare.spinoso/rsasumm/finetuning/2024-08-06-17:38:51.477512/lightning_logs/version_0/checkpoints/epoch=43-step=4972.ckpt
+  qmsum: /network/scratch/c/cesare.spinoso/rsasumm/finetuning/2024-08-07-13:13:00.267260/lightning_logs/version_0/checkpoints/epoch=49-step=1750.ckpt
+  squality: /network/scratch/c/cesare.spinoso/rsasumm/finetuning/2024-08-07-17:24:10.365242/lightning_logs/version_0/checkpoints/epoch=49-step=1600.ckpt

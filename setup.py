@@ -41,5 +41,11 @@ setup(
         "scipy",
         "ipython",
         "protobuf",
+        "evaluate",
+        "stanza",
+        "datasets",
+        "sh",
+        "accelerate",
+        "bitsandbutes",
     ],
 )

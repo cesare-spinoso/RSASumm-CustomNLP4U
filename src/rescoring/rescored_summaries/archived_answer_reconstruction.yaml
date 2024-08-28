@@ -1,0 +1,4 @@
+llama3_qfs_diverse_beam_5:
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/answer_reconstruction/answer_reconstruction/llama3_qfs/2024-07-31-13:48:46.692217.jsonl
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/answer_reconstruction/answer_reconstruction/llama3_qfs/2024-07-31-13:51:50.609533.jsonl
+  squality: /home/mila/c/cesare.spinoso/RSASumm/data/rescoring/answer_reconstruction/answer_reconstruction/llama3_qfs/2024-07-31-13:51:49.783767.jsonl

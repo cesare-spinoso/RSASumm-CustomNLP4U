@@ -1,0 +1,29 @@
+merged_scores_yaml: /home/mila/c/cesare.spinoso/RSASumm/src/rescoring/merged_rescores/merged_rescores.yaml
+summarizer_names:
+- llama3_qfs_diverse_beam_5
+- llama3_qfs_temp_2
+- llama3_qfs_nucleus_0.95
+- llama3_qfs_topk_640
+- llama3_qfs_nucleus_0.95_temp_1.2
+- llama3_qfs_nucleus_0.95_temp_1.5
+- bart_finetuned_qfs_temp_2
+- bart_finetuned_qfs_nucleus_0.95
+- bart_finetuned_qfs_topk_640
+- bart_finetuned_qfs_nucleus_0.95_temp_1.2
+- bart_finetuned_qfs_nucleus_0.95_temp_1.5
+dataset_names:
+- multioped
+- qmsum
+- squality
+metric: rouge
+lambda_interval: 0.1
+evaluations:
+- best_candidate
+- random_candidate
+- S0-only
+- R1-only
+- weighted_rsa_scaled_lambda
+write_config_directory: /home/mila/c/cesare.spinoso/RSASumm/src/evaluation/config_instances/qfs_summaries
+output_directory: /home/mila/c/cesare.spinoso/RSASumm/data/evaluation/qfs_summaries
+commit: false
+finished_running: false

@@ -1,0 +1,13 @@
+summarizer_name: llama3_qfs_temp_2
+qa_name: llama3_qfs_temp_2
+datasets:
+  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/multioped/test.csv
+  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/qmsum/test_new.csv
+  squality: /home/mila/c/cesare.spinoso/RSASumm/data/squality/test.csv
+yaml_files:
+  qfs_summaries: /home/mila/c/cesare.spinoso/RSASumm/src/generate_summaries/generated_summaries/qfs_summaries.yaml
+  answer_reconstruction: /home/mila/c/cesare.spinoso/RSASumm/src/rescoring/rescored_summaries/answer_reconstruction.yaml
+write_config_directory: /home/mila/c/cesare.spinoso/RSASumm/src/rescoring/config_instances/merge_rescores
+output_directory: /network/scratch/c/cesare.spinoso/rsasumm/rescoring/merge_rescores
+commit: false
+finished_running: false

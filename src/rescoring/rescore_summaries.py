@@ -8,20 +8,26 @@ import yaml
 from hydra.core.hydra_config import HydraConfig
 from omegaconf import DictConfig
 from tqdm import tqdm
-from transformers import T5ForConditionalGeneration, T5Tokenizer
+from transformers import (
+    T5ForConditionalGeneration,
+    T5Tokenizer,
+    AutoTokenizer,
+    AutoModelForCausalLM,
+)
 
-from src import SCRATCH_CACHE_DIR, SRC_DIRECTORY
+from src import HF_TOKEN, SCRATCH_CACHE_DIR, SRC_DIRECTORY
 from src.utils.decorators import main_decorator
-from src.utils.helper import append_jsonlines, read_jsonlines
+from src.utils.helper import append_jsonlines, get_values_from_jsonlines, read_jsonlines
+from src.utils.inference import batch_data
 
 
 def sanity_check_config(cfg):
     hydra_job = HydraConfig.get().job
     hydra_runtime = HydraConfig.get().runtime
     assert cfg["dataset_name"] == hydra_job["config_name"]
-    assert (
-        cfg["rescoring"]["type"] in cfg["write_config_directory"]
-        and cfg["summarizer_name"] in cfg["write_config_directory"]
+    assert cfg["rescoring"]["type"] in cfg["write_config_directory"] and (
+        cfg["summarizer_name"] in cfg["write_config_directory"]
+        or "llama3" in cfg["write_config_directory"]
     )
     assert any(
         f"{cfg['rescoring']['type']}" in dict_elt["path"]
@@ -29,6 +35,7 @@ def sanity_check_config(cfg):
     )
     assert any(
         f"{cfg['summarizer_name']}" in dict_elt["path"]
+        or "llama3" in dict_elt["path"]
         for dict_elt in hydra_runtime["config_sources"]
     )
 
@@ -43,6 +50,8 @@ def get_latent_column_name(dataset_name):
     elif dataset_name == "multioped":
         return "answer"
     elif dataset_name == "qmsum":
+        return "question"
+    elif dataset_name == "squality":
         return "question"
     else:
         raise ValueError(f"Dataset name {dataset_name} not recognized")
@@ -61,6 +70,23 @@ def load_model(cfg):
         )
         tokenizer = T5Tokenizer.from_pretrained(
             cfg["tokenizer"]["name"], cache_dir=SCRATCH_CACHE_DIR, legacy=False
+        )
+    elif model_name == tokenizer_name and "Llama-3" in model_name:
+        tokenizer = AutoTokenizer.from_pretrained(
+            tokenizer_name,
+            padding_size="left",
+            token=HF_TOKEN,
+            cache_dir=SCRATCH_CACHE_DIR,
+        )
+        tokenizer.pad_token = tokenizer.eos_token
+        # Should use left padding since want the generation to immediately
+        # start after the prompt
+        model = AutoModelForCausalLM.from_pretrained(
+            model_name,
+            load_in_8bit=True,
+            device_map="auto",
+            token=HF_TOKEN,
+            cache_dir=SCRATCH_CACHE_DIR,
         )
     else:
         raise ValueError(
@@ -94,16 +120,18 @@ def get_summary_jsonl(cfg, run_name):
         )
         append_jsonlines(rescored_summaries, output_directory, run_name)
         if cfg["rescoring"]["type"] == "source_reconstruction":
-            generated_source_pred = [
-                (elt["pred"], elt["source"]) for elt in rescored_summaries
+            generated_source = [
+                elt["source"] for elt in rescored_summaries
             ]
             summary_jsonl_data = [
                 elt
                 for elt in summary_jsonl_data
-                if (elt["pred"], elt["source"]) not in generated_source_pred
+                if elt["source"] not in generated_source
             ]
             return summary_jsonl_data, None
         elif cfg["rescoring"]["type"] == "latent_reconstruction":
+            return summary_jsonl_data, rescored_summaries
+        elif cfg["rescoring"]["type"] == "answer_reconstruction":
             return summary_jsonl_data, rescored_summaries
         else:
             raise ValueError("Rescoring type not recognized")
@@ -120,6 +148,16 @@ def process_llama2_preds(rec_input):
         else:
             rec_input[i] = elt
     return rec_input
+
+
+def process_llama3_preds(preds: list[str], pred_type: str = "summary") -> list[str]:
+    if pred_type == "summary":
+        for i, elt in enumerate(preds):
+            preds[i] = elt.split("Summary:assistant")[1].strip()
+    elif pred_type == "qa":
+        for i, elt in enumerate(preds):
+            preds[i] = elt.split("Answer: assistant")[1].strip()
+    return preds
 
 
 def generic_latent_rec_values(summary_jsonl_data, rescored_summaries, cfg):
@@ -211,8 +249,14 @@ def get_source_rec_values(summary_jsonl_data, cfg):
     doc_ids = [obj["document_id"] for obj in summary_jsonl_data]
     rec_input = [obj["pred"] for obj in summary_jsonl_data]
     rec_target = [obj["source"] for obj in summary_jsonl_data]
-    if "llama" in cfg["summarizer_name"]:
+    if "llama2" in cfg["summarizer_name"]:
         rec_input = process_llama2_preds(rec_input)
+    elif "llama3" in cfg["summarizer_name"]:
+        rec_input = process_llama3_preds(rec_input, pred_type="summary")
+    if "prompt" in cfg["rescoring"]:
+        rec_input = [
+            cfg["rescoring"]["prompt"].format(s=summary) for summary in rec_input
+        ]
     return doc_ids, rec_input, rec_target
 
 
@@ -309,25 +353,31 @@ def compute_source_reconstruction(run_name, cfg):
         # if the input and target combined exceed the max length which
         # I think makes sense when you think of the transformer encoder/
         # decoder architecture
-        targets_tokenized = tokenizer(
-            batch_targets, padding=True, truncation=True, return_tensors="pt"
-        ).input_ids.to("cuda")
-        input_tokenized = tokenizer(
-            batch_input, padding=True, truncation=True, return_tensors="pt"
-        ).input_ids.to("cuda")
-        # Compute the conditional log-likelihood for P(source|summary)
-        # (value will be NEGATIVE)
-        # NOTE: For T5, I have modified the transformers source code
-        # to return a loss vector rather than a mean
-        # This is to allow batching of the loss computation
-        # I use a different method which does not use this hack
-        conditional_likelihoods, avg_conditional_likelihoods = get_likelihood_scores(
+        target_input_ids = tokenizer(
+            batch_targets, padding=False, truncation=False, add_special_tokens=False
+        )["input_ids"]
+        target_shape = [len(x) for x in target_input_ids]
+        input_shape = [
+            len(x)
+            for x in tokenizer(batch_input, padding=False, truncation=False)[
+                "input_ids"
+            ]
+        ]
+        concatenated_input_target = [
+            input_ + target for input_, target in zip(batch_input, batch_targets)
+        ]
+        concatenated_input_ids = tokenizer(
+            concatenated_input_target,
+            padding=True,
+            truncation=False,
+            return_tensors="pt",
+        )["input_ids"].to("cuda")
+        conditional_likelihoods, avg_conditional_likelihoods = get_qa_likelihood_scores(
             model=model,
-            tokenizer=tokenizer,
-            is_last_batch=(num_batches - 1 == i),
-            batch_size=batch_size,
-            targets_tokenized=targets_tokenized,
-            input_tokenized=input_tokenized,
+            concatenated_input_ids=concatenated_input_ids,
+            input_shape=input_shape,
+            answer_input_ids=target_input_ids,
+            answer_shape=target_shape,
         )
         # Write to new jsonl
         dict_to_write = [
@@ -335,8 +385,8 @@ def compute_source_reconstruction(run_name, cfg):
                 "document_id": batch_doc_ids[i],
                 "source": batch_targets[i],
                 "pred": batch_input[i],
-                "reconstruction_score": conditional_likelihoods[i],
-                "avg_reconstruction_score": avg_conditional_likelihoods[i],
+                "reconstruction_score": float(conditional_likelihoods[i]),
+                "avg_reconstruction_score": float(avg_conditional_likelihoods[i]),
             }
             for i in range(len(batch_doc_ids))
         ]
@@ -344,6 +394,7 @@ def compute_source_reconstruction(run_name, cfg):
             cfg["output_directory"], cfg["rescoring"]["type"], cfg["summarizer_name"]
         )
         append_jsonlines(dict_to_write, output_directory, run_name)
+
 
 
 def compute_latent_reconstruction(run_name, cfg):
@@ -398,11 +449,186 @@ def compute_latent_reconstruction(run_name, cfg):
         append_jsonlines(dict_to_write, output_directory, run_name)
 
 
+def get_answer_reconstruction_data(cfg, run_name):
+    summary_jsonl_data = []
+    with open(cfg["rescoring"]["generated_summaries_yaml"], "r") as yaml_file:
+        try:
+            generated_summaries = yaml.safe_load(yaml_file)
+        except yaml.YAMLError as exc:
+            print(exc)
+    if "subkey" in cfg:
+        summary_jsonl_path = generated_summaries[cfg["summarizer_name"]][
+            cfg["dataset_name"]
+        ][cfg["subkey"]]
+    else:
+        summary_jsonl_path = generated_summaries[cfg["summarizer_name"]][
+            cfg["dataset_name"]
+        ]
+    summary_jsonl_data = read_jsonlines(summary_jsonl_path)
+    if "rescored_summaries_jsonl_path" in cfg["rescoring"]:
+        rescored_summaries = read_jsonlines(
+            cfg["rescoring"]["rescored_summaries_jsonl_path"]
+        )
+        output_directory = os.path.join(
+            cfg["output_directory"], cfg["rescoring"]["type"], cfg["summarizer_name"]
+        )
+        append_jsonlines(rescored_summaries, output_directory, run_name)
+        generated_source_pred = [
+            (elt["summary"], elt["source"], elt["question"]) for elt in rescored_summaries
+        ]
+        summary_jsonl_data = [
+            elt
+            for elt in summary_jsonl_data
+            if (elt["pred"], elt["source"], elt["question"]) not in generated_source_pred
+        ]
+    document_ids, documents, summaries, questions = get_values_from_jsonlines(
+        jsonlines_data=summary_jsonl_data,
+        keys=["document_id", "source", "pred", "question"],
+    )
+    if cfg["summarizer_name"].startswith("llama3"):
+        summaries = process_llama3_preds(summaries, pred_type="summary")
+    answers_jsonl_path = cfg["rescoring"]["generated_answers_path"]
+    answers_data = read_jsonlines(answers_jsonl_path)
+    answers_doc_id, answers_questions, generated_answers = get_values_from_jsonlines(
+        jsonlines_data=answers_data,
+        keys=["document_id", "question", "generated_answer"],
+    )
+    if (qa_name := cfg.get("qa_name")) == "llama3_qa":
+        generated_answers = process_llama3_preds(generated_answers, pred_type="qa")
+    else:
+        raise ValueError(f"QA name {qa_name} not recognized")
+    answers_dict = dict(
+        zip(
+            [
+                (ans_id, ans_q)
+                for ans_id, ans_q in zip(answers_doc_id, answers_questions)
+            ],
+            generated_answers,
+        )
+    )
+
+    return (
+        document_ids,
+        documents,
+        summaries,
+        questions,
+        [answers_dict[(doc_id, q)] for doc_id, q in zip(document_ids, questions)],
+    )
+
+
+def get_qa_likelihood_scores(
+    model, concatenated_input_ids, input_shape, answer_input_ids, answer_shape
+):
+    output_logits = model(concatenated_input_ids).logits.to("cuda")
+    sliced_normalized_logits = []
+    for tensor_2d, start, offset, answer_ids in zip(
+        output_logits, input_shape, answer_shape, answer_input_ids
+    ):
+        sliced_normalized_logits += [
+            torch.gather(
+                input=torch.log_softmax(tensor_2d[start : (start + offset), :], dim=1),
+                dim=1,
+                index=torch.tensor(answer_ids)[:, None].to("cuda"),
+            ).sum()
+        ]
+    sliced_normalized_logits = torch.tensor(sliced_normalized_logits)
+    answer_shape = torch.tensor(answer_shape)
+    return sliced_normalized_logits.to("cpu"), (
+        sliced_normalized_logits / answer_shape
+    ).to("cpu")
+
+
+def combine_inputs_for_qa(
+    prompt: str, summaries: list[str], questions: list[str]
+) -> list[str]:
+    combined = []
+    for s, q in zip(summaries, questions):
+        combined.append(prompt.format(d=s, q=q))
+    return combined
+
+
+def compute_qa_reconstruction(run_name, cfg):
+    # Load model and tokenizer and set to inference mode
+    model, tokenizer = load_model(cfg)
+    # Load data
+    document_ids, documents, summaries, questions, answers = (
+        get_answer_reconstruction_data(cfg, run_name)
+    )
+    inputs = combine_inputs_for_qa(
+        prompt=cfg["rescoring"]["prompt"],
+        summaries=summaries,
+        questions=questions,
+    )
+    # Run in batches
+    batch_size = cfg["rescoring"]["batch_size"]
+    num_batches = len(document_ids) // batch_size + (
+        0 if len(document_ids) % batch_size == 0 else 1
+    )
+    for i in tqdm(range(num_batches)):
+        (
+            batch_doc_ids,
+            batch_docs,
+            batch_summaries,
+            batch_questions,
+            batch_answer,
+            batch_inputs,
+        ) = batch_data(
+            data=[document_ids, documents, summaries, questions, answers, inputs],
+            batch_size=batch_size,
+            idx=i,
+        )
+        answer_input_ids = tokenizer(
+            batch_answer, padding=False, truncation=False, add_special_tokens=False
+        )["input_ids"]
+        answer_shape = [len(x) for x in answer_input_ids]
+        input_shape = [
+            len(x)
+            for x in tokenizer(batch_inputs, padding=False, truncation=False)[
+                "input_ids"
+            ]
+        ]
+        concatenated_input_answer = [
+            input_ + answer for input_, answer in zip(batch_inputs, batch_answer)
+        ]
+        concatenated_input_ids = tokenizer(
+            concatenated_input_answer,
+            padding=True,
+            truncation=False,
+            return_tensors="pt",
+        )["input_ids"].to("cuda")
+        conditional_likelihoods, avg_conditional_likelihoods = get_qa_likelihood_scores(
+            model=model,
+            concatenated_input_ids=concatenated_input_ids,
+            input_shape=input_shape,
+            answer_input_ids=answer_input_ids,
+            answer_shape=answer_shape,
+        )
+        # Write to new jsonl
+        dict_to_write = [
+            {
+                "document_id": batch_doc_ids[i],
+                "source": batch_docs[i],
+                "question": batch_questions[i],
+                "summary": batch_summaries[i],
+                "answer": batch_answer[i],
+                "reconstruction_score": float(conditional_likelihoods[i]),
+                "avg_reconstruction_score": float(avg_conditional_likelihoods[i]),
+            }
+            for i in range(len(batch_doc_ids))
+        ]
+        output_directory = os.path.join(
+            cfg["output_directory"], cfg["rescoring"]["type"], cfg["summarizer_name"]
+        )
+        append_jsonlines(dict_to_write, output_directory, run_name)
+
+
 @hydra.main(
     version_base=None,
     config_path=os.path.join(
-        SRC_DIRECTORY, "rescoring", "conf",
-    )
+        SRC_DIRECTORY,
+        "rescoring",
+        "conf",
+    ),
 )
 @main_decorator
 def main(run_name: str, cfg: DictConfig):
@@ -412,8 +638,8 @@ def main(run_name: str, cfg: DictConfig):
     # TODO: Add option if prediction was also conditioned on latent
     elif cfg["rescoring"]["type"] == "latent_reconstruction":
         compute_latent_reconstruction(run_name, cfg)
-    elif cfg["rescoring"]["type"] == "qa_rescoring":
-        raise NotImplementedError("QA rescoring not implemented")
+    elif cfg["rescoring"]["type"] == "answer_reconstruction":
+        compute_qa_reconstruction(run_name, cfg)
     else:
         raise ValueError("Rescoring type not recognized")
 

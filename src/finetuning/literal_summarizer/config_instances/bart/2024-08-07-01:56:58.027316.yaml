@@ -1,0 +1,26 @@
+model:
+  name: facebook/bart-large
+  is_logging_rouge_scores: true
+  test_interval_computation: 5
+  test_num_batch_sample: 1
+  generation_kwargs:
+    do_sample: true
+    max_new_tokens: 100
+data:
+  name: multioped
+  csv_dir: /home/mila/c/cesare.spinoso/RSASumm/data/multioped
+  dataset_formatting:
+    data_format: e2e
+hps:
+  train_batch_size: 16
+  test_batch_size: 16
+  gradient_accumulation_steps: 2
+  epochs: 50
+  patience: 30
+  learning_rate: 0.0003
+  weight_decay: 0.1
+  warmup: 0.1
+output_directory: /network/scratch/c/cesare.spinoso/rsasumm/finetuning
+write_config_directory: /home/mila/c/cesare.spinoso/RSASumm/src/finetuning/literal_summarizer/config_instances/bart
+commit: false
+finished_running: false

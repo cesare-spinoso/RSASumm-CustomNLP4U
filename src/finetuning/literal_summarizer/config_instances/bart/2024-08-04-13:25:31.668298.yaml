@@ -1,0 +1,28 @@
+model:
+  name: facebook/bart-large
+  is_logging_rouge_scores: true
+  test_interval_computation: 5
+  test_num_batch_sample: 1
+  generation_kwargs:
+    num_beams: 5
+    max_new_tokens: 100
+    early_stopping: true
+data:
+  name: squality
+  csv_dir: /home/mila/c/cesare.spinoso/RSASumm/data/squality
+  dataset_formatting:
+    data_format: e2e
+hps:
+  train_batch_size: 16
+  test_batch_size: 16
+  gradient_accumulation_steps: 2
+  epochs: 30
+  patience: 5
+  learning_rate: 0.0002
+  weight_decay: 0.1
+  warmup: 0.1
+output_directory: /network/scratch/c/cesare.spinoso/rsasumm/finetuning
+write_config_directory: /home/mila/c/cesare.spinoso/RSASumm/src/finetuning/literal_summarizer/config_instances/bart
+commit: false
+finished_running: true
+best_model_path: /network/scratch/c/cesare.spinoso/rsasumm/finetuning/2024-08-04-13:25:31.668298/lightning_logs/version_0/checkpoints/epoch=10-step=352.ckpt

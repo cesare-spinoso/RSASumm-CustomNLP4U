@@ -164,3 +164,4 @@ outputs/
 cluster_scripts/
 scrap_work/
 .vscode/
+multirun/
