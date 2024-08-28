@@ -1,5 +1,0 @@
-generate_summaries_yaml_paths:
-- /home/mila/c/cesare.spinoso/RSASumm/src/generate_summaries/generated_summaries/e2e_finetuned_summaries.yaml
-cache_directory: /home/mila/c/cesare.spinoso/RSASumm/data/generate_summaries/cache
-write_config_directory: /home/mila/c/cesare.spinoso/RSASumm/src/generate_summaries/config_instances/populate_cache
-finished_running: true

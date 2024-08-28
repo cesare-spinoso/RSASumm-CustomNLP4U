@@ -1,5 +1,0 @@
-yaml_file_path: /home/mila/c/cesare.spinoso/RSASumm/src/generate_summaries/generated_summaries/e2e_summaries.yaml
-diversity_metric: Hamming
-write_config_directory: /home/mila/c/cesare.spinoso/RSASumm/src/summary_statistics/config_instances/summary_diversity
-output_directory: /home/mila/c/cesare.spinoso/RSASumm/data/summary_statistics/summary_diversity
-finished_running: true

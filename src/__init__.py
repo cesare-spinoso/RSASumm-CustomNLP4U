@@ -4,19 +4,19 @@ from pathlib import Path
 # Repo specific constants
 SRC_DIRECTORY = Path(__file__).parent
 
-LOG_CONFIG_PATH = os.path.join(SRC_DIRECTORY, "..", "configs", "logging.conf")
+LOG_CONFIG_PATH = os.path.join(SRC_DIRECTORY, "XXX")
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+OPENAI_API_KEY = os.getenv("XXX")
 
-HF_TOKEN = "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"
+HF_TOKEN = "XXX"
 
-DATASET_NAMES = {"covidet", "debatepedia", "duc_single", "multioped", "qmsum", "squality"}
+DATASET_NAMES = {"XXX"}
 
-METRICS_CACHE_DIR = os.path.join(SRC_DIRECTORY, "..", "data", "evaluation", "metrics_cache")
+METRICS_CACHE_DIR = os.path.join(SRC_DIRECTORY, "XXX")
 
-WANDB_DIRECTORY = os.path.join(SRC_DIRECTORY, "..", "data", "wandb")
+WANDB_DIRECTORY = os.path.join(SRC_DIRECTORY, "XXX")
 
 # Mila cluster specific constants
-SCRATCH_DIR = SRC_DIRECTORY.parent.parent / "scratch"
+SCRATCH_DIR = SRC_DIRECTORY.parent.parent / "XXX"
 
-SCRATCH_CACHE_DIR = SCRATCH_DIR / ".cache"
+SCRATCH_CACHE_DIR = SCRATCH_DIR / "XXX"

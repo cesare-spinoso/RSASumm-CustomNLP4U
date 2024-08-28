@@ -1,8 +1,0 @@
-llama3:
-  multioped: /home/mila/c/cesare.spinoso/RSASumm/data/qa_generation/2024-07-24-11:52:25.428224.jsonl
-  qmsum: /home/mila/c/cesare.spinoso/RSASumm/data/qa_generation/2024-07-30-17:30:08.429106.jsonl
-  squality: /home/mila/c/cesare.spinoso/RSASumm/data/qa_generation/2024-07-30-17:11:26.259867.jsonl
-# llama3_qa_for_generated_qs:
-#   multioped: 2024-08-08-18:31:04.205641
-#   qmsum: 2024-08-08-15:58:14.552575
-#   squality: 2024-08-08-18:04:23.649208
