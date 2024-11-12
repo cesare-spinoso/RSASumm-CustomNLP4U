@@ -4,7 +4,7 @@ Repository for the paper "Does This Summary Answer My Question? Modeling Query-F
 
 # Paper poster
 
-[poster](RSA-QFS CustomNLP4U Poster.png)
+![poster](RSA-QFS CustomNLP4U Poster.png)
 
 # Navigating the repository
 
